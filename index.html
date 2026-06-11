@@ -201,9 +201,6 @@
       sel.appendChild(opt);
     }
 
-    document.getElementById('data-info').textContent =
-      `📊 数据来源：百度高考 · 2022-2024年 · ${Object.keys(UNIVERSITIES).length}所高校 · 全国${PROVINCES.length}省 · ${SCORE_LINES.length}条录取记录`;
-
     // Update trust row with actual numbers
     const uniCount = Object.keys(UNIVERSITIES).length;
     document.getElementById('t-unis').textContent = uniCount;
@@ -269,10 +266,16 @@
         estimated: entry._estimated || false,
       };
 
-      const target = entry.estimated ? allResults : results;
-      if (diff >= 5 && diff <= 25) { results['冲一冲'].push(info); allResults['冲一冲'].push(info); }
-      else if (diff >= -5 && diff < 5) { results['稳一稳'].push(info); allResults['稳一稳'].push(info); }
-      else if (diff >= -30 && diff < -5) { results['保一保'].push(info); allResults['保一保'].push(info); }
+      if (diff >= 5 && diff <= 25) {
+        if (!entry.estimated) results['冲一冲'].push(info);
+        allResults['冲一冲'].push(info);
+      } else if (diff >= -5 && diff < 5) {
+        if (!entry.estimated) results['稳一稳'].push(info);
+        allResults['稳一稳'].push(info);
+      } else if (diff >= -30 && diff < -5) {
+        if (!entry.estimated) results['保一保'].push(info);
+        allResults['保一保'].push(info);
+      }
     }
 
     for (const tier of Object.keys(results)) {
