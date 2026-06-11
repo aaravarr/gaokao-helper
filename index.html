@@ -207,23 +207,44 @@
     const is33 = PROVINCES_33.has(province);
     const accepted = SUBJECT_ALIASES[subject] || new Set([subject]);
 
+    // Group ALL entries by university (not just province-specific)
     const schoolEntries = {};
     for (const entry of SCORE_LINES) {
-      if (entry.province !== province) continue;
-      if (!is33) {
-        if (entry.subject && !accepted.has(entry.subject)) continue;
-      }
       const uid = entry.university_id;
-      if (!schoolEntries[uid]) {
-        schoolEntries[uid] = entry;
-      }
+      if (!schoolEntries[uid]) schoolEntries[uid] = [];
+      schoolEntries[uid].push(entry);
     }
 
     const results = { '冲一冲': [], '稳一稳': [], '保一保': [] };
+    const allResults = { '冲一冲': [], '稳一稳': [], '保一保': [] };
+    let hasProvinceData = false;
 
-    for (const [uid, entry] of Object.entries(schoolEntries)) {
+    for (const [uid, entries] of Object.entries(schoolEntries)) {
       const uni = UNIVERSITIES[uid];
-      if (!uni || entry.min_score == null) continue;
+      if (!uni) continue;
+
+      // Filter to matching subject + province for cross-province fallback
+      const subjectEntries = entries.filter(e => {
+        if (is33) return true; // 3+3 provinces have no subject distinction
+        if (!e.subject) return true;
+        return accepted.has(e.subject);
+      });
+      if (subjectEntries.length === 0) continue;
+
+      // Find entries for this province specifically
+      const provinceEntries = subjectEntries.filter(e => e.province === province);
+      let entry = provinceEntries.find(e => e.min_score != null);
+      
+      if (entry && entry.min_score != null) {
+        hasProvinceData = true;
+      } else {
+        // Fallback: use average across other provinces (subject-matched)
+        const validEntries = subjectEntries.filter(e => e.min_score != null);
+        if (validEntries.length === 0) continue;
+        const avgScore = Math.round(validEntries.reduce((a, e) => a + e.min_score, 0) / validEntries.length);
+        const avgRank = validEntries.find(e => e.min_rank)?.min_rank || null;
+        entry = { min_score: avgScore, min_rank: avgRank, year: Math.max(...validEntries.map(e => e.year)), _estimated: true };
+      }
 
       const diff = entry.min_score - score;
       const info = {
@@ -235,18 +256,24 @@
         min_rank: entry.min_rank,
         year: entry.year,
         diff: diff,
+        estimated: entry._estimated || false,
       };
 
-      if (diff >= 5 && diff <= 25) results['冲一冲'].push(info);
-      else if (diff >= -5 && diff < 5) results['稳一稳'].push(info);
-      else if (diff >= -30 && diff < -5) results['保一保'].push(info);
+      const target = entry.estimated ? allResults : results;
+      if (diff >= 5 && diff <= 25) { results['冲一冲'].push(info); allResults['冲一冲'].push(info); }
+      else if (diff >= -5 && diff < 5) { results['稳一稳'].push(info); allResults['稳一稳'].push(info); }
+      else if (diff >= -30 && diff < -5) { results['保一保'].push(info); allResults['保一保'].push(info); }
     }
 
     for (const tier of Object.keys(results)) {
       results[tier].sort((a, b) => b.min_score - a.min_score);
+      allResults[tier].sort((a, b) => b.min_score - a.min_score);
     }
 
-    return results;
+    // If we have few province-specific results, mix in estimated ones
+    const provinceTotal = Object.values(results).reduce((a, arr) => a + arr.length, 0);
+    const final = provinceTotal >= 3 ? results : allResults;
+    return { results: final, hasProvinceData, provinceTotal };
   }
 
   // === UI ===
@@ -268,12 +295,12 @@
     div.innerHTML = '<div class="card"><div class="loading"><div class="spinner"></div><p style="margin-top:16px;color:#888">正在匹配...</p></div></div>';
 
     // Use requestAnimationFrame so the loading spinner shows
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        const results = recommend(score, province, subject);
-        renderResults({ score, province, subject, results }, div);
-      }, 50);
-    });
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const { results, hasProvinceData, provinceTotal } = recommend(score, province, subject);
+          renderResults({ score, province, subject, results, hasProvinceData, provinceTotal }, div);
+        }, 50);
+      });
   }
 
   function renderResults(data, container) {
@@ -290,7 +317,9 @@
       <strong>${data.province}</strong> · ${data.subject} · <strong>${data.score}分</strong>
       　共匹配到 <strong>${total}</strong> 所学校
       <button id="share-btn" onclick="shareResult()" style="float:right;padding:6px 16px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;font-size:.85em">📋 复制分享链接</button>
-    </div>`;
+    </div>
+    ${data.provinceTotal < 3 ? '<div style="background:#fff9db;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.85em;color:#e67700">⚠️ 该省份录取数据较少，部分学校显示的是全国平均分数作为参考（标有"参考"标签）</div>' : ''}
+    `;
 
     for (const tier of tiers) {
       const schools = data.results[tier.key] || [];
@@ -313,6 +342,7 @@
           const diffText = s.diff > 0 ? `+${s.diff}` : `${s.diff}`;
           const rankText = s.min_rank ? `<div style="font-size:.75em;color:#868e96;margin-top:1px">≈${s.min_rank.toLocaleString()}位</div>` : '';
           const yearTag = s.year ? `<span class="badge" style="background:#f1f3f5;color:#868e96">${s.year}</span>` : '';
+          const estTag = s.estimated ? '<span class="badge" style="background:#fff9db;color:#e67700">参考</span>' : '';
 
           html += `<div class="school-card">
             <div>
@@ -322,6 +352,7 @@
                 <span class="badge badge-city">${s.city}</span>
                 ${tags}
                 ${yearTag}
+                ${estTag}
               </div>
             </div>
             <div class="school-score">
