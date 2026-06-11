@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>志愿星 — AI 高考志愿填报助手</title>
+  <meta name="description" content="输入高考分数，一键获取 冲/稳/保 志愿推荐。覆盖66所高校、全国31省、2022-2024年真实录取数据。">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333}
+    .container{max-width:900px;margin:0 auto;padding:40px 20px}
+    header{text-align:center;color:white;margin-bottom:40px}
+    header h1{font-size:2.4em;font-weight:700;margin-bottom:8px}
+    header p{font-size:1.1em;opacity:.85}
+    header .subtitle{font-size:.82em;color:#b8c6e8;margin-top:8px}
+    .card{background:white;border-radius:16px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.15);margin-bottom:24px}
+    .form-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+    .form-group{flex:1;min-width:160px}
+    label{display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:.95em}
+    select,input[type="number"]{width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:1.1em;transition:border-color .2s;outline:none;background:#fafafa}
+    select:focus,input:focus{border-color:#667eea;background:white}
+    button{width:100%;padding:16px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:12px;font-size:1.2em;font-weight:600;cursor:pointer;transition:transform .1s,box-shadow .2s}
+    button:hover{transform:translateY(-1px);box-shadow:0 8px 25px rgba(102,126,234,.4)}
+    button:active{transform:translateY(0)}
+    .tier-section{margin-bottom:28px}
+    .tier-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #eee}
+    .tier-icon{font-size:1.5em}
+    .tier-label{font-size:1.3em;font-weight:700}
+    .tier-desc{color:#888;font-size:.85em}
+    .tier-reach .tier-header{border-color:#ff6b6b}
+    .tier-match .tier-header{border-color:#51cf66}
+    .tier-safety .tier-header{border-color:#339af0}
+    .school-card{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;margin-bottom:8px;border-radius:10px;background:#f8f9fa;transition:background .15s}
+    .school-card:hover{background:#e9ecef}
+    .school-name{font-weight:600;font-size:1.05em}
+    .school-meta{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap}
+    .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.75em;font-weight:600}
+    .badge-985{background:#fff3bf;color:#e67700}
+    .badge-211{background:#d3f9d8;color:#2b8a3e}
+    .badge-city{background:#e7f5ff;color:#1864ab}
+    .badge-tag{background:#f3f0ff;color:#7048e8}
+    .school-score{text-align:right;min-width:80px}
+    .score-value{font-size:1.4em;font-weight:700;color:#333}
+    .score-diff{font-size:.85em;margin-top:2px}
+    .diff-pos{color:#e03131}
+    .diff-neg{color:#2f9e44}
+    .diff-zero{color:#868e96}
+    .info-bar{background:#f0f4ff;border-radius:10px;padding:16px 20px;margin-bottom:24px;font-size:.95em;color:#495057;line-height:1.6}
+    .empty-state{text-align:center;padding:40px;color:#aaa}
+    .loading{text-align:center;padding:40px}
+    .loading .spinner{display:inline-block;width:40px;height:40px;border:4px solid #e0e0e0;border-top:4px solid #667eea;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .footer{text-align:center;color:rgba(255,255,255,.5);font-size:.8em;margin-top:40px;padding:20px}
+    .footer a{color:rgba(255,255,255,.7)}
+    @media(max-width:600px){
+      .container{padding:20px 12px}
+      header h1{font-size:1.8em}
+      .card{padding:20px}
+      .form-group{min-width:100%}
+      .tier-desc{display:none}
+      .school-card{flex-direction:column;align-items:flex-start;gap:8px}
+      .school-score{text-align:left}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⭐ 志愿星</h1>
+      <p>AI 高考志愿填报助手 — 输入分数，找到你的学校</p>
+      <p class="subtitle" id="data-info">📊 加载数据中...</p>
+    </header>
+
+    <div class="card">
+      <div class="form-row">
+        <div class="form-group">
+          <label>📍 省份</label>
+          <select id="province"></select>
+        </div>
+        <div class="form-group">
+          <label>📊 高考分数</label>
+          <input type="number" id="score" min="200" max="750" placeholder="例：620" />
+          <small id="score-hint" style="color:#888;font-size:.8em;display:none">海南满分900</small>
+        </div>
+        <div class="form-group">
+          <label id="subject-label">📚 科类</label>
+          <select id="subject">
+            <option value="物理类">物理类</option>
+            <option value="历史类">历史类</option>
+          </select>
+          <small id="subject-hint" style="color:#888;font-size:.8em;display:none">3+3省份不分文理</small>
+        </div>
+      </div>
+      <button onclick="doSearch()">🔍 查询推荐</button>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="footer">
+      志愿星 · 数据来源：百度高考 · 2022-2024年真实录取分数线<br>
+      仅供参考，实际填报请以官方数据为准
+    </div>
+  </div>
+
+  <script>
+  // === Data (loaded async) ===
+  let DATA = null;
+  const UNIVERSITIES = {};
+  const SCORE_LINES = [];
+  let PROVINCES = [];
+
+  // Province classification
+  const PROVINCES_33 = new Set(['浙江','上海','北京','天津','山东','海南']);
+  const PROVINCES_OLD = new Set(['新疆','西藏']);
+  const PROVINCES_900 = new Set(['海南']);
+  const SUBJECT_ALIASES = {
+    '物理类': new Set(['物理类','理科']),
+    '理科': new Set(['物理类','理科']),
+    '历史类': new Set(['历史类','文科']),
+    '文科': new Set(['历史类','文科']),
+  };
+
+  async function loadData() {
+    const resp = await fetch('data.json');
+    DATA = await resp.json();
+
+    // Expand university map
+    for (const [id, u] of Object.entries(DATA.universities)) {
+      UNIVERSITIES[id] = { name: u.n, tier: u.t, city: u.c, province: u.p, tags: u.g };
+    }
+
+    // Expand score entries
+    for (const s of DATA.scores) {
+      SCORE_LINES.push({
+        university_id: s.u,
+        province: s.p,
+        subject: s.s,
+        year: s.y,
+        batch: s.b,
+        min_score: s.m,
+        min_rank: s.r,
+      });
+    }
+
+    PROVINCES = DATA.provinces;
+
+    // Populate province dropdown
+    const sel = document.getElementById('province');
+    for (const p of PROVINCES) {
+      const opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      sel.appendChild(opt);
+    }
+
+    document.getElementById('data-info').textContent =
+      `📊 数据来源：百度高考 · 2022-2024年 · ${Object.keys(UNIVERSITIES).length}所高校 · 全国${PROVINCES.length}省 · ${SCORE_LINES.length}条录取记录`;
+
+    updateSubjectUI();
+  }
+
+  // === Algorithm ===
+  function recommend(score, province, subject) {
+    const is33 = PROVINCES_33.has(province);
+    const accepted = SUBJECT_ALIASES[subject] || new Set([subject]);
+
+    const schoolEntries = {};
+    for (const entry of SCORE_LINES) {
+      if (entry.province !== province) continue;
+      if (!is33) {
+        if (entry.subject && !accepted.has(entry.subject)) continue;
+      }
+      const uid = entry.university_id;
+      if (!schoolEntries[uid]) {
+        schoolEntries[uid] = entry;
+      }
+    }
+
+    const results = { '冲一冲': [], '稳一稳': [], '保一保': [] };
+
+    for (const [uid, entry] of Object.entries(schoolEntries)) {
+      const uni = UNIVERSITIES[uid];
+      if (!uni || entry.min_score == null) continue;
+
+      const diff = entry.min_score - score;
+      const info = {
+        name: uni.name,
+        tier: uni.tier,
+        city: uni.city,
+        tags: uni.tags || [],
+        min_score: entry.min_score,
+        min_rank: entry.min_rank,
+        year: entry.year,
+        diff: diff,
+      };
+
+      if (diff >= 5 && diff <= 25) results['冲一冲'].push(info);
+      else if (diff >= -5 && diff < 5) results['稳一稳'].push(info);
+      else if (diff >= -30 && diff < -5) results['保一保'].push(info);
+    }
+
+    for (const tier of Object.keys(results)) {
+      results[tier].sort((a, b) => b.min_score - a.min_score);
+    }
+
+    return results;
+  }
+
+  // === UI ===
+  function doSearch() {
+    const score = parseInt(document.getElementById('score').value);
+    const province = document.getElementById('province').value;
+    const subject = document.getElementById('subject').value;
+    const div = document.getElementById('results');
+
+    if (!DATA) {
+      div.innerHTML = '<div class="card"><div class="empty-state">数据加载中，请稍候...</div></div>';
+      return;
+    }
+    if (!score || score < 200 || score > 900) {
+      div.innerHTML = '<div class="card"><div class="empty-state">请输入有效分数（200-900）</div></div>';
+      return;
+    }
+
+    div.innerHTML = '<div class="card"><div class="loading"><div class="spinner"></div><p style="margin-top:16px;color:#888">正在匹配...</p></div></div>';
+
+    // Use requestAnimationFrame so the loading spinner shows
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const results = recommend(score, province, subject);
+        renderResults({ score, province, subject, results }, div);
+      }, 50);
+    });
+  }
+
+  function renderResults(data, container) {
+    const tiers = [
+      { key: '冲一冲', icon: '🔥', css: 'tier-reach', desc: '分数线略高于你 — 冲一下有可能' },
+      { key: '稳一稳', icon: '✅', css: 'tier-match', desc: '分数线和你匹配 — 比较稳妥' },
+      { key: '保一保', icon: '🛡️', css: 'tier-safety', desc: '分数线低于你 — 保底选择' },
+    ];
+
+    let total = 0;
+    for (const t of tiers) total += (data.results[t.key] || []).length;
+
+    let html = `<div class="card"><div class="info-bar">
+      <strong>${data.province}</strong> · ${data.subject} · <strong>${data.score}分</strong>
+      　共匹配到 <strong>${total}</strong> 所学校
+    </div>`;
+
+    for (const tier of tiers) {
+      const schools = data.results[tier.key] || [];
+      html += `<div class="tier-section ${tier.css}">
+        <div class="tier-header">
+          <span class="tier-icon">${tier.icon}</span>
+          <span class="tier-label">${tier.key}</span>
+          <span class="tier-desc">${tier.desc}（${schools.length} 所）</span>
+        </div>`;
+
+      if (schools.length === 0) {
+        html += '<div style="padding:16px;color:#aaa;text-align:center">暂无匹配学校</div>';
+      } else {
+        for (const s of schools) {
+          const tierBadge = s.tier === '985' ? '<span class="badge badge-985">985</span>'
+                          : s.tier === '211' ? '<span class="badge badge-211">211</span>' : '';
+          const tags = (s.tags || []).slice(0, 2).map(t => `<span class="badge badge-tag">${t}</span>`).join('');
+          const diffClass = s.diff > 0 ? 'diff-pos' : s.diff < 0 ? 'diff-neg' : 'diff-zero';
+          const diffText = s.diff > 0 ? `+${s.diff}` : `${s.diff}`;
+
+          html += `<div class="school-card">
+            <div>
+              <div class="school-name">${s.name}</div>
+              <div class="school-meta">
+                ${tierBadge}
+                <span class="badge badge-city">${s.city}</span>
+                ${tags}
+              </div>
+            </div>
+            <div class="school-score">
+              <div class="score-value">${s.min_score}</div>
+              <div class="score-diff ${diffClass}">${diffText} 分</div>
+            </div>
+          </div>`;
+        }
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  // Province-aware subject labels
+  function updateSubjectUI() {
+    const p = document.getElementById('province').value;
+    const ss = document.getElementById('subject');
+    const sl = document.getElementById('subject-label');
+    const sh = document.getElementById('subject-hint');
+    const si = document.getElementById('score');
+    const sch = document.getElementById('score-hint');
+
+    if (PROVINCES_33.has(p)) {
+      ss.style.display = 'none'; sl.style.display = 'none';
+      sh.style.display = 'block'; sh.textContent = '新高考3+3省份不分文理';
+    } else if (PROVINCES_OLD.has(p)) {
+      ss.style.display = ''; sl.style.display = ''; sh.style.display = 'none';
+      ss.options[0].text = '理科'; ss.options[1].text = '文科';
+    } else {
+      ss.style.display = ''; sl.style.display = ''; sh.style.display = 'none';
+      ss.options[0].text = '物理类'; ss.options[1].text = '历史类';
+    }
+
+    if (PROVINCES_900.has(p)) {
+      si.max = 900; sch.style.display = 'block';
+    } else {
+      si.max = 750; sch.style.display = 'none';
+    }
+  }
+
+  // === Init ===
+  document.getElementById('province').addEventListener('change', updateSubjectUI);
+  document.getElementById('score').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  loadData();
+  </script>
+</body>
+</html>
