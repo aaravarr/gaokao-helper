@@ -231,8 +231,11 @@
           <div class="filter-chips" id="tier-chips"></div>
         </div>
         <div class="filter-section">
-          <div class="filter-section-label">📍 地区</div>
+          <div class="filter-section-label">📍 地区 <span id="region-hint" style="font-size:.9em;font-weight:400;color:#a09882"></span></div>
           <div class="filter-chips" id="region-chips"></div>
+          <div id="city-area" style="display:none;margin-top:8px">
+            <div class="filter-chips" id="city-chips"></div>
+          </div>
         </div>
         <div class="filter-section">
           <div class="filter-section-label">🎓 学校类型</div>
@@ -346,7 +349,7 @@
   let LAST_RESULTS = null;
 
   // === Filters ===
-  const FILTERS = { tiers: new Set(), regions: new Set(), groups: new Set() };
+  const FILTERS = { tiers: new Set(), regions: new Set(), cities: new Set(), groups: new Set() };
   const REGIONS = {
     '华北': ['北京','天津','河北','山西','内蒙古'],
     '东北': ['辽宁','吉林','黑龙江'],
@@ -496,28 +499,30 @@
 
   // === Filters ===
   function initFilters() {
-    // Count universities per tier
     const tierCounts = {};
     const regionCounts = {};
+    const cityCounts = {};
     const groupCounts = {};
     for (const u of Object.values(UNIVERSITIES)) {
       const t = u.tier || '普通本科';
       tierCounts[t] = (tierCounts[t] || 0) + 1;
-      // Map city to region
+      // Region
       for (const [region, provs] of Object.entries(REGIONS)) {
         if (provs.includes(u.province)) {
           regionCounts[region] = (regionCounts[region] || 0) + 1;
           break;
         }
       }
-      // Count groups
+      // City
+      const city = u.city;
+      if (city) cityCounts[city] = (cityCounts[city] || 0) + 1;
+      // Groups
       for (const g of (u.tags || [])) {
-        if (['双一流','211','教育部直属','中央部委院校'].includes(g)) continue;
         groupCounts[g] = (groupCounts[g] || 0) + 1;
       }
     }
 
-    // Build tier chips
+    // Tier chips
     const tierOrder = ['985','211','双一流','普通本科'];
     const tierContainer = document.getElementById('tier-chips');
     for (const t of tierOrder) {
@@ -531,24 +536,35 @@
       tierContainer.appendChild(chip);
     }
 
-    // Build region chips
+    // Region chips — clicking shows cities in that region
     const regionOrder = ['华北','东北','华东','华中','华南','西南','西北'];
     const regionContainer = document.getElementById('region-chips');
+    window._regionChips = {};
     for (const r of regionOrder) {
       const count = regionCounts[r] || 0;
       if (count === 0) continue;
       const chip = document.createElement('span');
       chip.className = 'filter-chip';
       chip.dataset.value = r;
+      chip.dataset.region = r;
       chip.innerHTML = `${r} <span class="chip-count">${count}</span>`;
-      chip.onclick = () => toggleChip('regions', r, chip);
+      chip.onclick = () => {
+        toggleChip('regions', r, chip);
+        showCitiesForRegion(r);
+      };
       regionContainer.appendChild(chip);
+      window._regionChips[r] = chip;
     }
 
-    // Build group chips (top 12)
+    // Group chips — show top school types
     const groupContainer = document.getElementById('group-chips');
-    const topGroups = Object.entries(groupCounts).sort((a,b) => b[1]-a[1]).slice(0, 12);
-    for (const [g, count] of topGroups) {
+    const groupOrder = ['综合','理工','师范','医学','财经','农林','艺术','政法','外语','民族','体育','军事','交通','建筑','海洋','航空','计算机','电子信息'];
+    const topGroups = groupOrder.filter(g => groupCounts[g]).concat(
+      Object.keys(groupCounts).filter(g => !groupOrder.includes(g) && groupCounts[g] >= 5)
+    );
+    for (const g of topGroups) {
+      const count = groupCounts[g] || 0;
+      if (count === 0) continue;
       const chip = document.createElement('span');
       chip.className = 'filter-chip';
       chip.dataset.value = g;
@@ -557,6 +573,55 @@
       groupContainer.appendChild(chip);
     }
 
+    updateFilterSummary();
+  }
+
+  function showCitiesForRegion(region) {
+    const area = document.getElementById('city-area');
+    const chipsDiv = document.getElementById('city-chips');
+    const hint = document.getElementById('region-hint');
+
+    // If region is being deactivated, hide cities
+    if (!FILTERS.regions.has(region)) {
+      // Check if any region is still active
+      if (FILTERS.regions.size === 0) {
+        area.style.display = 'none';
+        hint.textContent = '';
+        FILTERS.cities.clear();
+        updateFilterSummary();
+      }
+      return;
+    }
+
+    // Get cities in the selected region(s)
+    const regionProvs = [];
+    for (const r of FILTERS.regions) {
+      regionProvs.push(...(REGIONS[r] || []));
+    }
+
+    const cityCounts = {};
+    for (const u of Object.values(UNIVERSITIES)) {
+      if (regionProvs.includes(u.province) && u.city) {
+        cityCounts[u.city] = (cityCounts[u.city] || 0) + 1;
+      }
+    }
+
+    // Clear and rebuild city chips
+    chipsDiv.innerHTML = '';
+    const sortedCities = Object.entries(cityCounts).sort((a,b) => b[1]-a[1]);
+    for (const [city, count] of sortedCities) {
+      const chip = document.createElement('span');
+      chip.className = 'filter-chip' + (FILTERS.cities.has(city) ? ' active' : '');
+      chip.dataset.value = city;
+      chip.innerHTML = `${city} <span class="chip-count">${count}</span>`;
+      chip.onclick = () => {
+        toggleChip('cities', city, chip);
+      };
+      chipsDiv.appendChild(chip);
+    }
+
+    area.style.display = 'block';
+    hint.textContent = `· 点击展开城市（${sortedCities.length}个）`;
     updateFilterSummary();
   }
 
@@ -575,8 +640,13 @@
   function clearFilters() {
     FILTERS.tiers.clear();
     FILTERS.regions.clear();
+    FILTERS.cities.clear();
     FILTERS.groups.clear();
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    const area = document.getElementById('city-area');
+    if (area) area.style.display = 'none';
+    const hint = document.getElementById('region-hint');
+    if (hint) hint.textContent = '';
     updateFilterSummary();
   }
 
@@ -588,7 +658,7 @@
   }
 
   function updateFilterSummary() {
-    const total = FILTERS.tiers.size + FILTERS.regions.size + FILTERS.groups.size;
+    const total = FILTERS.tiers.size + FILTERS.regions.size + FILTERS.cities.size + FILTERS.groups.size;
     const countEl = document.getElementById('filter-count');
     if (total > 0) {
       countEl.textContent = total;
@@ -596,7 +666,6 @@
     } else {
       countEl.classList.remove('show');
     }
-    // Update summary text
     const filtered = countMatchingUniversities();
     const summaryEl = document.getElementById('filter-summary');
     if (total > 0) {
@@ -615,12 +684,12 @@
   }
 
   function passesFilter(uni) {
-    // Tier filter
+    // Tier
     if (FILTERS.tiers.size > 0) {
       const t = uni.tier || '普通本科';
       if (!FILTERS.tiers.has(t)) return false;
     }
-    // Region filter
+    // Region
     if (FILTERS.regions.size > 0) {
       let inRegion = false;
       for (const r of FILTERS.regions) {
@@ -628,16 +697,24 @@
       }
       if (!inRegion) return false;
     }
-    // Group filter
+    // City (more specific than region — if cities selected, must match one)
+    if (FILTERS.cities.size > 0) {
+      if (!FILTERS.cities.has(uni.city)) return false;
+    }
+    // Group/type
     if (FILTERS.groups.size > 0) {
       const tags = uni.tags || [];
-      if (!FILTERS.groups.has(tags[0]) && !FILTERS.groups.has(tags[1])) return false;
+      let match = false;
+      for (const g of tags) {
+        if (FILTERS.groups.has(g)) { match = true; break; }
+      }
+      if (!match) return false;
     }
     return true;
   }
 
   function getActiveFilterCount() {
-    return FILTERS.tiers.size + FILTERS.regions.size + FILTERS.groups.size;
+    return FILTERS.tiers.size + FILTERS.regions.size + FILTERS.cities.size + FILTERS.groups.size;
   }
 
   // === Algorithm ===
