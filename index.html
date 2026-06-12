@@ -571,7 +571,7 @@
 
     // Group chips — show top school types
     const groupContainer = document.getElementById('group-chips');
-    const groupOrder = ['综合','理工','师范','医学','财经','农林','艺术','政法','外语','民族','体育','军事','交通','建筑','海洋','航空','计算机','电子信息'];
+    const groupOrder = ['综合','理工','师范','医药','财经','政法','农林','艺术','语言','民族','体育'];
     const topGroups = groupOrder.filter(g => groupCounts[g]).concat(
       Object.keys(groupCounts).filter(g => !groupOrder.includes(g) && groupCounts[g] >= 5)
     );
