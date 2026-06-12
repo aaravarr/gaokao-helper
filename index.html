@@ -56,6 +56,17 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     .footer{text-align:center;color:#a09882;font-size:.8em;margin-top:40px;padding:20px}
     .footer a{color:#8b7b6b}
+    .insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .insight-card{background:white;border-radius:6px;padding:18px;cursor:pointer;transition:all .2s;border:1px solid #e8e0d4;position:relative;overflow:hidden}
+    .insight-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(60,40,20,.1)}
+    .insight-card .insight-icon{font-size:1.8em;margin-bottom:6px}
+    .insight-card .insight-title{font-weight:700;font-size:1.05em;color:#2c2c2c;margin-bottom:4px}
+    .insight-card .insight-brief{font-size:.88em;color:#6b6356;line-height:1.4}
+    .insight-card .insight-brief strong{color:#b33a2b;font-size:1.2em}
+    .insight-card .insight-detail{max-height:0;overflow:hidden;transition:max-height .3s ease,margin-top .3s ease;font-size:.85em;color:#4a4438;line-height:1.6;margin-top:0}
+    .insight-card.expanded .insight-detail{max-height:200px;margin-top:10px}
+    .insight-card::after{content:'点击展开';position:absolute;top:12px;right:12px;font-size:.7em;color:#b8b0a0;transition:opacity .2s}
+    .insight-card.expanded::after{opacity:0}
     .how-it-works{display:flex;gap:20px;margin-bottom:24px;text-align:center}
     .how-step{flex:1;padding:20px 12px}
     .how-step .step-icon{font-size:2em;margin-bottom:8px}
@@ -88,6 +99,7 @@
       .how-it-works{flex-direction:column;gap:8px}
       .trust-row{flex-direction:column;gap:8px}
       .quick-examples{flex-direction:column}
+      .insights-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -148,6 +160,49 @@
     </div>
 
     <div id="results"></div>
+
+    <div class="card" id="insights-card" style="background:linear-gradient(135deg,#fdfbf7 0%,#f5f0e8 100%);border:1px solid #e8dfd0">
+      <h3 style="text-align:center;font-size:1.3em;margin-bottom:6px;color:#2c2c2c">📊 数据发现</h3>
+      <p style="text-align:center;font-size:.88em;color:#a09882;margin-bottom:20px">来自 109,910 条真实录取数据的 4 个反直觉发现</p>
+      <div class="insights-grid">
+        <div class="insight-card" onclick="this.classList.toggle('expanded')">
+          <div class="insight-icon">🏷️</div>
+          <div class="insight-title">标签不等于实力</div>
+          <div class="insight-brief"><strong>49</strong> 所 211 比最容易的 985 还难考</div>
+          <div class="insight-detail">
+            <p>985→211 平均差距 51 分，但 211→双一流只差 1 分。北京邮电（211，612分）比西北农林（985，572分）难 40 分。</p>
+            <p style="margin-top:6px;color:#8b5a2b">💡 别只盯标签，看分数和城市更实在。</p>
+          </div>
+        </div>
+        <div class="insight-card" onclick="this.classList.toggle('expanded')">
+          <div class="insight-icon">🏙️</div>
+          <div class="insight-title">城市溢价 ≈ 30 分</div>
+          <div class="insight-brief">同一级别学校，大城市贵 <strong>~30</strong> 分</div>
+          <div class="insight-detail">
+            <p>北京校平均 615 分，上海 613 分。同样的 211 标签，在省会可能只要 570。这 30 分买的是实习机会和人脉网络。</p>
+            <p style="margin-top:6px;color:#8b5a2b">💡 如果分数有限，选好城市的普通校 vs 小城市的名校，是真正的权衡。</p>
+          </div>
+        </div>
+        <div class="insight-card" onclick="this.classList.toggle('expanded')">
+          <div class="insight-icon">💎</div>
+          <div class="insight-title">隐藏宝藏 211</div>
+          <div class="insight-brief">8 所 211 大学 <strong>500 分</strong>就能上</div>
+          <div class="insight-detail">
+            <p>延边大学（501）、西藏大学（504）、石河子大学（508）、海南大学（527）等——211 毕业证对简历筛选很重要，这些是真正的"性价比之王"。</p>
+            <p style="margin-top:6px;color:#8b5a2b">💡 代价是偏远地区。但对中分段考生，这是用 500 分拿 211 文凭的机会。</p>
+          </div>
+        </div>
+        <div class="insight-card" onclick="this.classList.toggle('expanded')">
+          <div class="insight-icon">👑</div>
+          <div class="insight-title">真正的全国第一</div>
+          <div class="insight-brief">国科大平均 <strong>690 分</strong>，超过清华北大</div>
+          <div class="insight-detail">
+            <p>中国科学院大学不是 985，只招 400 人/年，但录取分比清华（678）还高 12 分。小而精的极致。</p>
+            <p style="margin-top:6px;color:#8b5a2b">💡 "双一流"标签下藏着真正的王者。报志愿时别被标签限制了视野。</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="card" style="background:#f8f9fa">
       <h3 style="margin-bottom:16px;text-align:center">为什么用志愿星？</h3>
