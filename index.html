@@ -372,7 +372,7 @@
   };
 
   async function loadData() {
-    const resp = await fetch('data.json');
+    const resp = await fetch('data2.json');
     const reader = resp.body.getReader();
     const contentLength = +resp.headers.get('Content-Length');
     const chunks = [];
@@ -402,25 +402,30 @@
     const text = new TextDecoder('utf-8').decode(allChunks);
     DATA = JSON.parse(text);
 
-    // Expand university map
-    for (const [id, u] of Object.entries(DATA.universities)) {
-      UNIVERSITIES[id] = { name: u.n, tier: u.t, city: u.c, province: u.p, tags: u.g };
+    // Unpack compact format: u = [[name, tier, city, province, [groups]], ...]
+    const uniArr = DATA.u;
+    for (let i = 0; i < uniArr.length; i++) {
+      const u = uniArr[i];
+      UNIVERSITIES[i] = { name: u[0], tier: u[1], city: u[2], province: u[3], tags: u[4] || [] };
     }
 
-    // Expand score entries
-    for (const s of DATA.scores) {
+    // Unpack scores: s = [[uniIdx, provIdx, subjIdx, year, batchIdx, score, rank], ...]
+    const provList = DATA.pl;
+    const subjList = DATA.sl;
+    const batchList = DATA.bl;
+    for (const row of DATA.s) {
       SCORE_LINES.push({
-        university_id: s.u,
-        province: s.p,
-        subject: s.s,
-        year: s.y,
-        batch: s.b,
-        min_score: s.m,
-        min_rank: s.r,
+        university_id: row[0],
+        province: provList[row[1]],
+        subject: subjList[row[2]],
+        year: row[3],
+        batch: batchList[row[4]],
+        min_score: row[5],
+        min_rank: row[6] >= 0 ? row[6] : null,
       });
     }
 
-    PROVINCES = DATA.provinces;
+    PROVINCES = DATA.p;
 
     // Populate province dropdown
     const sel = document.getElementById('province');
