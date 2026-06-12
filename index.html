@@ -107,6 +107,29 @@
     .summary-item{text-align:center}
     .summary-num{font-size:2em;font-weight:700}
     .summary-label{font-size:.85em;color:#8a8275}
+    .countdown-banner{background:linear-gradient(135deg,#b33a2b,#d4a853);color:white;padding:14px 20px;border-radius:6px;text-align:center;margin-bottom:20px;animation:pulse-border 2s ease-in-out infinite}
+    .countdown-banner .countdown-title{font-size:1.15em;font-weight:700;margin-bottom:4px}
+    .countdown-banner .countdown-sub{font-size:.88em;opacity:.9}
+    .countdown-banner .countdown-date{font-size:1.3em;font-weight:800;letter-spacing:.02em}
+    @keyframes pulse-border{0%,100%{box-shadow:0 2px 12px rgba(179,58,43,.2)}50%{box-shadow:0 4px 24px rgba(179,58,43,.35)}}
+    .report-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
+    .report-card{background:white;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;border-radius:8px;padding:32px;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+    .report-card h2{text-align:center;color:#b33a2b;margin-bottom:4px;font-size:1.5em}
+    .report-card .report-meta{text-align:center;color:#6b6356;font-size:.9em;margin-bottom:20px}
+    .report-card .report-tier{margin-bottom:16px}
+    .report-card .report-tier h4{font-size:1em;padding-bottom:6px;border-bottom:2px solid #eee;margin-bottom:8px}
+    .report-card .report-school{display:flex;justify-content:space-between;padding:6px 0;font-size:.9em;border-bottom:1px solid #f5f0e8}
+    .report-card .report-school:last-child{border-bottom:none}
+    .report-card .report-actions{display:flex;gap:10px;margin-top:20px;justify-content:center}
+    .report-card .report-actions button{flex:1;max-width:200px;padding:12px;border:none;border-radius:4px;font-size:1em;font-weight:600;cursor:pointer}
+    @media print{
+      body{background:white!important}
+      .container{max-width:100%;padding:0}
+      .countdown-banner,.report-actions,#share-btn,.quick-examples,button{display:none!important}
+      .card{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid}
+      .school-card{page-break-inside:avoid}
+      #results{display:block!important}
+    }
     @media(max-width:600px){
       .container{padding:20px 12px}
       header h1{font-size:1.8em}
@@ -124,6 +147,10 @@
   </style>
 </head>
 <body>
+  <div id="loading-overlay" style="position:fixed;top:0;left:0;right:0;z-index:1000;background:#f5f0e8;padding:0">
+    <div id="load-progress" style="height:3px;background:#b33a2b;width:0;transition:width .1s"></div>
+    <div id="load-progress-text" style="text-align:center;font-size:.8em;color:#a09882;padding:4px 0"></div>
+  </div>
   <div class="container">
     <header>
       <h1>⭐ 志愿<span>星</span></h1>
@@ -136,6 +163,12 @@
         <div class="trust-item"><strong>2022-2024</strong>真实分数线</div>
       </div>
     </header>
+
+    <div class="countdown-banner" id="countdown-banner">
+      <div class="countdown-title">📍 2025 高考成绩即将公布</div>
+      <div class="countdown-sub">预计各省 6月23-25日起陆续查询</div>
+      <div class="countdown-date" id="countdown-text"></div>
+    </div>
 
     <div class="card">
       <div class="how-it-works">
@@ -272,6 +305,7 @@
   const UNIVERSITIES = {};
   const SCORE_LINES = [];
   let PROVINCES = [];
+  let LAST_RESULTS = null;
 
   // Province classification
   const PROVINCES_33 = new Set(['浙江','上海','北京','天津','山东','海南']);
@@ -286,7 +320,34 @@
 
   async function loadData() {
     const resp = await fetch('data.json');
-    DATA = await resp.json();
+    const reader = resp.body.getReader();
+    const contentLength = +resp.headers.get('Content-Length');
+    const chunks = [];
+    let received = 0;
+
+    const progressEl = document.getElementById('load-progress');
+    const progressText = document.getElementById('load-progress-text');
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.length;
+      if (contentLength && progressEl) {
+        const pct = Math.round(received / contentLength * 100);
+        progressEl.style.width = pct + '%';
+        if (progressText) progressText.textContent = `加载数据 ${pct}%`;
+      }
+    }
+
+    const allChunks = new Uint8Array(received);
+    let position = 0;
+    for (const chunk of chunks) {
+      allChunks.set(chunk, position);
+      position += chunk.length;
+    }
+    const text = new TextDecoder('utf-8').decode(allChunks);
+    DATA = JSON.parse(text);
 
     // Expand university map
     for (const [id, u] of Object.entries(DATA.universities)) {
@@ -323,6 +384,14 @@
     document.getElementById('t-entries').textContent = SCORE_LINES.length.toLocaleString();
 
     updateSubjectUI();
+
+    // Hide loading overlay
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.style.transition = 'opacity .3s';
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 300);
+    }
   }
 
   // === History, Trend, Sparkline ===
@@ -513,7 +582,8 @@
       requestAnimationFrame(() => {
         setTimeout(() => {
           const { results, hasProvinceData, provinceTotal, useRank } = recommend(score, province, subject, rank);
-          renderResults({ score, province, subject, rank, results, hasProvinceData, provinceTotal, useRank }, div);
+          LAST_RESULTS = { score, province, subject, rank, results, hasProvinceData, provinceTotal, useRank };
+          renderResults(LAST_RESULTS, div);
         }, 50);
       });
   }
@@ -538,6 +608,7 @@
       ${useRank ? ` · <strong>位次 ${data.rank}</strong>（按位次推荐）` : ''}
       　共匹配到 <strong>${total}</strong> 所学校
       <button id="share-btn" onclick="shareResult()" style="float:right;padding:6px 16px;background:#b33a2b;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em">📋 复制分享链接</button>
+      <button id="report-btn" onclick="showReport()" style="float:right;padding:6px 16px;background:#2c5282;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em;margin-right:8px">📄 保存报告</button>
     </div>
     ${data.provinceTotal < 3 ? '<div style="background:#f5e6d0;border-radius:3px;padding:10px 14px;margin-bottom:16px;font-size:.85em;color:#8b5a2b">⚠️ 该省份录取数据较少，部分学校显示的是全国平均分数作为参考（标有"参考"标签）</div>' : ''}
     `;
@@ -701,6 +772,111 @@
   })();
 
   loadData();
+
+  // === Countdown ===
+  (function updateCountdown() {
+    const now = new Date();
+    const targets = [
+      { date: new Date('2025-06-23T09:00:00+08:00'), label: '6月23日 起' },
+      { date: new Date('2025-06-25T09:00:00+08:00'), label: '6月25日 全部' },
+    ];
+    const banner = document.getElementById('countdown-banner');
+    const text = document.getElementById('countdown-text');
+    if (!text) return;
+
+    // If scores are already out (past June 25)
+    if (now > targets[1].date) {
+      banner.style.background = 'linear-gradient(135deg,#27ae60,#2ecc71)';
+      text.textContent = '🎉 成绩已公布！快来查推荐 →';
+      return;
+    }
+
+    // Find nearest upcoming target
+    const target = now < targets[0].date ? targets[0] : targets[1];
+    const diff = target.date - now;
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+
+    if (days > 0) {
+      text.textContent = `⏳ 距成绩公布约 ${days} 天 ${hours} 小时`;
+    } else if (hours > 0) {
+      text.textContent = `⏳ 距成绩公布约 ${hours} 小时 ${mins} 分钟`;
+    } else {
+      text.textContent = `⏳ 成绩即将公布！`;
+    }
+
+    // Update every minute
+    setTimeout(updateCountdown, 60000);
+  })();
+
+  // === Report ===
+  function showReport() {
+    if (!LAST_RESULTS) return;
+    const data = LAST_RESULTS;
+
+    const tiers = [
+      { key: '冲一冲', icon: '🔥', color: '#c0392b' },
+      { key: '稳一稳', icon: '✅', color: '#27ae60' },
+      { key: '保一保', icon: '🛡️', color: '#2980b9' },
+    ];
+
+    let schoolsHtml = '';
+    let total = 0;
+    for (const t of tiers) {
+      const schools = data.results[t.key] || [];
+      total += schools.length;
+      if (schools.length === 0) continue;
+      schoolsHtml += `<div class="report-tier"><h4 style="color:${t.color}">${t.icon} ${t.key}（${schools.length} 所）</h4>`;
+      for (const s of schools) {
+        const tag = s.tier === '985' ? ' [985]' : s.tier === '211' ? ' [211]' : '';
+        const diffText = data.useRank ? `${s.rank_ratio}倍` : (s.diff > 0 ? `+${s.diff}分` : `${s.diff}分`);
+        const trendText = s.trend && s.trend.dir !== 'stable' ? ` (${s.trend.dir === 'up' ? '↑' : '↓'}${Math.abs(s.trend.slope)}分/年)` : '';
+        schoolsHtml += `<div class="report-school"><span>${s.name}${tag} · ${s.city}${trendText}</span><span style="font-weight:700;color:${t.color}">${s.min_score}分（${diffText}）</span></div>`;
+      }
+      schoolsHtml += '</div>';
+    }
+
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const url = `${location.origin}${location.pathname}?p=${encodeURIComponent(data.province)}&s=${data.score}&k=${encodeURIComponent(data.subject)}${data.rank ? '&r='+data.rank : ''}`;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'report-overlay';
+    overlay.innerHTML = `<div class="report-card">
+      <h2>⭐ 志愿星 推荐报告</h2>
+      <div class="report-meta">${data.province} · ${data.subject} · ${data.score}分${data.useRank ? ' · 位次'+data.rank : ''} · 共 ${total} 所推荐</div>
+      <div class="report-meta" style="font-size:.8em;color:#a09882;margin-top:-14px">${dateStr} · 数据来源：2022-2024年真实录取分数线</div>
+      ${schoolsHtml}
+      <p style="font-size:.78em;color:#a09882;text-align:center;margin-top:12px">以上为 AI 参考推荐，实际填报请结合本省招生政策和官方数据</p>
+      <p style="font-size:.75em;color:#b8b0a0;text-align:center;margin-top:4px">🔗 ${url}</p>
+      <div class="report-actions">
+        <button onclick="window.print()" style="background:#b33a2b;color:white">🖨️ 打印</button>
+        <button onclick="copyReportLink()" style="background:#2c5282;color:white">📋 复制链接</button>
+        <button onclick="closeReport()" style="background:#e8e0d4;color:#4a4438">关闭</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeReport(); });
+  }
+
+  function closeReport() {
+    const overlay = document.querySelector('.report-overlay');
+    if (overlay) overlay.remove();
+  }
+
+  function copyReportLink() {
+    if (!LAST_RESULTS) return;
+    const d = LAST_RESULTS;
+    const url = `${location.origin}${location.pathname}?p=${encodeURIComponent(d.province)}&s=${d.score}&k=${encodeURIComponent(d.subject)}${d.rank ? '&r='+d.rank : ''}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        const btns = document.querySelectorAll('.report-actions button');
+        btns[1].textContent = '✅ 已复制';
+        setTimeout(() => btns[1].textContent = '📋 复制链接', 2000);
+      });
+    }
+  }
   </script>
 </body>
 </html>
