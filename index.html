@@ -345,6 +345,7 @@
   let DATA = null;
   const UNIVERSITIES = {};
   const SCORE_LINES = [];
+  const UNI_ENTRIES = {};  // Pre-grouped: uid → [entries]
   let PROVINCES = [];
   let LAST_RESULTS = null;
 
@@ -423,6 +424,13 @@
         min_score: row[5],
         min_rank: row[6] >= 0 ? row[6] : null,
       });
+    }
+
+    // Pre-group entries by university for fast recommend()
+    for (const entry of SCORE_LINES) {
+      const uid = entry.university_id;
+      if (!UNI_ENTRIES[uid]) UNI_ENTRIES[uid] = [];
+      UNI_ENTRIES[uid].push(entry);
     }
 
     PROVINCES = DATA.p;
@@ -728,21 +736,14 @@
     const accepted = SUBJECT_ALIASES[subject] || new Set([subject]);
     const useRank = rank != null && rank > 0;
 
-    // Group ALL entries by university (not just province-specific)
-    const schoolEntries = {};
-    for (const entry of SCORE_LINES) {
-      const uid = entry.university_id;
-      if (!schoolEntries[uid]) schoolEntries[uid] = [];
-      schoolEntries[uid].push(entry);
-    }
-
     const results = { '冲一冲': [], '稳一稳': [], '保一保': [] };
     const allResults = { '冲一冲': [], '稳一稳': [], '保一保': [] };
     let hasProvinceData = false;
 
-    for (const [uid, entries] of Object.entries(schoolEntries)) {
+    for (const uid of Object.keys(UNIVERSITIES)) {
+      const entries = UNI_ENTRIES[uid];
+      if (!entries || entries.length === 0) continue;
       const uni = UNIVERSITIES[uid];
-      if (!uni) continue;
       if (!passesFilter(uni)) continue;
 
       // Filter to matching subject + province for cross-province fallback
@@ -769,8 +770,19 @@
       }
 
       const diff = entry.min_score - score;
-      // Get deduplicated history for sparklines
-      const history = getHistory(uid, province, subject);
+      // Compute history from already-grouped entries (avoid O(260K) getHistory scan)
+      const histByYear = {};
+      const histAccepted = SUBJECT_ALIASES[subject] || new Set([subject]);
+      for (const e of entries) {
+        if (e.province !== province) continue;
+        if (!is33 && e.subject && !histAccepted.has(e.subject)) continue;
+        if (e.min_score == null) continue;
+        const y = e.year || 2024;
+        if (!histByYear[y] || e.min_score < histByYear[y].min_score) {
+          histByYear[y] = { year: y, min_score: e.min_score, min_rank: e.min_rank, batch: e.batch || '' };
+        }
+      }
+      const history = Object.values(histByYear).sort((a, b) => a.year - b.year);
       const trend = computeTrend(history);
       const info = {
         name: uni.name,
