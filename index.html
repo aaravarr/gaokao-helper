@@ -122,10 +122,27 @@
     .report-card .report-school:last-child{border-bottom:none}
     .report-card .report-actions{display:flex;gap:10px;margin-top:20px;justify-content:center}
     .report-card .report-actions button{flex:1;max-width:200px;padding:12px;border:none;border-radius:4px;font-size:1em;font-weight:600;cursor:pointer}
+    .filter-panel{max-height:0;overflow:hidden;transition:max-height .3s ease;margin-top:0}
+    .filter-panel.open{max-height:600px;margin-top:16px}
+    .filter-toggle{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f5f0e8;border:1.5px solid #d5cfc3;border-radius:3px;cursor:pointer;font-size:.88em;color:#4a4438;transition:all .15s;margin-top:12px}
+    .filter-toggle:hover{border-color:#b33a2b;background:#ede4d8}
+    .filter-toggle .filter-count{background:#b33a2b;color:white;border-radius:10px;padding:1px 7px;font-size:.75em;font-weight:700;display:none}
+    .filter-toggle .filter-count.show{display:inline}
+    .filter-section{margin-bottom:14px}
+    .filter-section-label{font-size:.82em;font-weight:700;color:#8a8275;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+    .filter-chips{display:flex;flex-wrap:wrap;gap:6px}
+    .filter-chip{padding:5px 12px;border-radius:14px;font-size:.82em;cursor:pointer;border:1.5px solid #d5cfc3;background:white;color:#4a4438;transition:all .15s;user-select:none}
+    .filter-chip:hover{border-color:#b33a2b}
+    .filter-chip.active{background:#b33a2b;color:white;border-color:#b33a2b}
+    .filter-chip .chip-count{font-size:.8em;opacity:.7;margin-left:3px}
+    .filter-clear{font-size:.82em;color:#b33a2b;cursor:pointer;border:none;background:none;padding:4px 8px;text-decoration:underline}
+    .filter-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+    .filter-summary{font-size:.85em;color:#8a8275}
+    .filter-summary strong{color:#4a4438}
     @media print{
       body{background:white!important}
       .container{max-width:100%;padding:0}
-      .countdown-banner,.report-actions,#share-btn,.quick-examples,button{display:none!important}
+      .countdown-banner,.report-actions,#share-btn,.quick-examples,button,.filter-panel,.filter-toggle{display:none!important}
       .card{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid}
       .school-card{page-break-inside:avoid}
       #results{display:block!important}
@@ -201,6 +218,27 @@
         </div>
       </div>
       <button onclick="doSearch()">🔍 查询推荐</button>
+      <div class="filter-toggle" onclick="toggleFilters()">
+        🎛️ 筛选条件 <span class="filter-count" id="filter-count"></span> <span id="filter-arrow">▼</span>
+      </div>
+      <div class="filter-panel" id="filter-panel">
+        <div class="filter-bar">
+          <div class="filter-summary" id="filter-summary">601 所学校可选</div>
+          <button class="filter-clear" onclick="clearFilters()">清除全部</button>
+        </div>
+        <div class="filter-section">
+          <div class="filter-section-label">🏷️ 学校层次</div>
+          <div class="filter-chips" id="tier-chips"></div>
+        </div>
+        <div class="filter-section">
+          <div class="filter-section-label">📍 地区</div>
+          <div class="filter-chips" id="region-chips"></div>
+        </div>
+        <div class="filter-section">
+          <div class="filter-section-label">🎓 学校类型</div>
+          <div class="filter-chips" id="group-chips"></div>
+        </div>
+      </div>
       <div style="margin-top:16px">
         <p style="font-size:.85em;color:#a09882;margin-bottom:8px">💡 试试看（点击即查）：</p>
         <div class="quick-examples">
@@ -307,6 +345,18 @@
   let PROVINCES = [];
   let LAST_RESULTS = null;
 
+  // === Filters ===
+  const FILTERS = { tiers: new Set(), regions: new Set(), groups: new Set() };
+  const REGIONS = {
+    '华北': ['北京','天津','河北','山西','内蒙古'],
+    '东北': ['辽宁','吉林','黑龙江'],
+    '华东': ['上海','江苏','浙江','安徽','福建','江西','山东'],
+    '华中': ['河南','湖北','湖南'],
+    '华南': ['广东','广西','海南'],
+    '西南': ['重庆','四川','贵州','云南','西藏'],
+    '西北': ['陕西','甘肃','青海','宁夏','新疆'],
+  };
+
   // Province classification
   const PROVINCES_33 = new Set(['浙江','上海','北京','天津','山东','海南']);
   const PROVINCES_OLD = new Set(['新疆','西藏']);
@@ -384,6 +434,7 @@
     document.getElementById('t-entries').textContent = SCORE_LINES.length.toLocaleString();
 
     updateSubjectUI();
+    initFilters();
 
     // Hide loading overlay
     const overlay = document.getElementById('loading-overlay');
@@ -443,6 +494,152 @@
     return `<svg class="sparkline" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${color}" stroke-width="1.5" points="${pts.join(' ')}"/>${circles}</svg><span style="font-size:.65em;color:#a09882;margin-left:2px">${years[0]}'→${years[years.length-1]}'</span>`;
   }
 
+  // === Filters ===
+  function initFilters() {
+    // Count universities per tier
+    const tierCounts = {};
+    const regionCounts = {};
+    const groupCounts = {};
+    for (const u of Object.values(UNIVERSITIES)) {
+      const t = u.tier || '普通本科';
+      tierCounts[t] = (tierCounts[t] || 0) + 1;
+      // Map city to region
+      for (const [region, provs] of Object.entries(REGIONS)) {
+        if (provs.includes(u.province)) {
+          regionCounts[region] = (regionCounts[region] || 0) + 1;
+          break;
+        }
+      }
+      // Count groups
+      for (const g of (u.tags || [])) {
+        if (['双一流','211','教育部直属','中央部委院校'].includes(g)) continue;
+        groupCounts[g] = (groupCounts[g] || 0) + 1;
+      }
+    }
+
+    // Build tier chips
+    const tierOrder = ['985','211','双一流','普通本科'];
+    const tierContainer = document.getElementById('tier-chips');
+    for (const t of tierOrder) {
+      const count = tierCounts[t] || 0;
+      if (count === 0) continue;
+      const chip = document.createElement('span');
+      chip.className = 'filter-chip';
+      chip.dataset.value = t;
+      chip.innerHTML = `${t} <span class="chip-count">${count}</span>`;
+      chip.onclick = () => toggleChip('tiers', t, chip);
+      tierContainer.appendChild(chip);
+    }
+
+    // Build region chips
+    const regionOrder = ['华北','东北','华东','华中','华南','西南','西北'];
+    const regionContainer = document.getElementById('region-chips');
+    for (const r of regionOrder) {
+      const count = regionCounts[r] || 0;
+      if (count === 0) continue;
+      const chip = document.createElement('span');
+      chip.className = 'filter-chip';
+      chip.dataset.value = r;
+      chip.innerHTML = `${r} <span class="chip-count">${count}</span>`;
+      chip.onclick = () => toggleChip('regions', r, chip);
+      regionContainer.appendChild(chip);
+    }
+
+    // Build group chips (top 12)
+    const groupContainer = document.getElementById('group-chips');
+    const topGroups = Object.entries(groupCounts).sort((a,b) => b[1]-a[1]).slice(0, 12);
+    for (const [g, count] of topGroups) {
+      const chip = document.createElement('span');
+      chip.className = 'filter-chip';
+      chip.dataset.value = g;
+      chip.innerHTML = `${g} <span class="chip-count">${count}</span>`;
+      chip.onclick = () => toggleChip('groups', g, chip);
+      groupContainer.appendChild(chip);
+    }
+
+    updateFilterSummary();
+  }
+
+  function toggleChip(type, value, chip) {
+    const set = FILTERS[type];
+    if (set.has(value)) {
+      set.delete(value);
+      chip.classList.remove('active');
+    } else {
+      set.add(value);
+      chip.classList.add('active');
+    }
+    updateFilterSummary();
+  }
+
+  function clearFilters() {
+    FILTERS.tiers.clear();
+    FILTERS.regions.clear();
+    FILTERS.groups.clear();
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    updateFilterSummary();
+  }
+
+  function toggleFilters() {
+    const panel = document.getElementById('filter-panel');
+    const arrow = document.getElementById('filter-arrow');
+    panel.classList.toggle('open');
+    arrow.textContent = panel.classList.contains('open') ? '▲' : '▼';
+  }
+
+  function updateFilterSummary() {
+    const total = FILTERS.tiers.size + FILTERS.regions.size + FILTERS.groups.size;
+    const countEl = document.getElementById('filter-count');
+    if (total > 0) {
+      countEl.textContent = total;
+      countEl.classList.add('show');
+    } else {
+      countEl.classList.remove('show');
+    }
+    // Update summary text
+    const filtered = countMatchingUniversities();
+    const summaryEl = document.getElementById('filter-summary');
+    if (total > 0) {
+      summaryEl.innerHTML = `<strong>${filtered}</strong> / ${Object.keys(UNIVERSITIES).length} 所学校匹配`;
+    } else {
+      summaryEl.textContent = `${Object.keys(UNIVERSITIES).length} 所学校可选`;
+    }
+  }
+
+  function countMatchingUniversities() {
+    let count = 0;
+    for (const u of Object.values(UNIVERSITIES)) {
+      if (passesFilter(u)) count++;
+    }
+    return count;
+  }
+
+  function passesFilter(uni) {
+    // Tier filter
+    if (FILTERS.tiers.size > 0) {
+      const t = uni.tier || '普通本科';
+      if (!FILTERS.tiers.has(t)) return false;
+    }
+    // Region filter
+    if (FILTERS.regions.size > 0) {
+      let inRegion = false;
+      for (const r of FILTERS.regions) {
+        if ((REGIONS[r] || []).includes(uni.province)) { inRegion = true; break; }
+      }
+      if (!inRegion) return false;
+    }
+    // Group filter
+    if (FILTERS.groups.size > 0) {
+      const tags = uni.tags || [];
+      if (!FILTERS.groups.has(tags[0]) && !FILTERS.groups.has(tags[1])) return false;
+    }
+    return true;
+  }
+
+  function getActiveFilterCount() {
+    return FILTERS.tiers.size + FILTERS.regions.size + FILTERS.groups.size;
+  }
+
   // === Algorithm ===
   function recommend(score, province, subject, rank) {
     const is33 = PROVINCES_33.has(province);
@@ -464,6 +661,7 @@
     for (const [uid, entries] of Object.entries(schoolEntries)) {
       const uni = UNIVERSITIES[uid];
       if (!uni) continue;
+      if (!passesFilter(uni)) continue;
 
       // Filter to matching subject + province for cross-province fallback
       const subjectEntries = entries.filter(e => {
@@ -606,6 +804,7 @@
     let html = `<div class="card"><div class="info-bar">
       <strong>${data.province}</strong> · ${data.subject} · <strong>${data.score}分</strong>
       ${useRank ? ` · <strong>位次 ${data.rank}</strong>（按位次推荐）` : ''}
+      ${getActiveFilterCount() > 0 ? ` · 🔍 已筛选` : ''}
       　共匹配到 <strong>${total}</strong> 所学校
       <button id="share-btn" onclick="shareResult()" style="float:right;padding:6px 16px;background:#b33a2b;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em">📋 复制分享链接</button>
       <button id="report-btn" onclick="showReport()" style="float:right;padding:6px 16px;background:#2c5282;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em;margin-right:8px">📄 保存报告</button>
