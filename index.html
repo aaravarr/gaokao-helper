@@ -28,117 +28,158 @@
   }
   </script>
   <style>
+    :root {
+      /* === Design Tokens === */
+      /* Primary */
+      --color-primary: #b33a2b;
+      --color-primary-hover: #9a3024;
+      --color-primary-active: #832820;
+      --color-accent: #d4a853;
+      /* Background */
+      --color-bg: #f5f0e8;
+      --color-bg-card: #ffffff;
+      --color-bg-input: #fdfbf7;
+      --color-bg-subtle: #f8f9fa;
+      /* Text */
+      --color-text: #2c2c2c;
+      --color-text-secondary: #6b6356;
+      --color-text-muted: #a09882;
+      --color-text-label: #4a4438;
+      /* Border */
+      --color-border: #e8e0d4;
+      --color-border-input: #d5cfc3;
+      /* Tier */
+      --color-reach: #c0392b;
+      --color-match: #27ae60;
+      --color-safety: #2980b9;
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      /* Radius */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 2px 12px rgba(60,40,20,.08);
+      /* Transitions */
+      --transition-fast: 150ms ease;
+      --transition-normal: 200ms ease;
+    }
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;background:#f5f0e8;min-height:100vh;color:#2c2c2c}
+    body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;background:var(--color-bg);min-height:100vh;color:var(--color-text)}
     .container{max-width:920px;margin:0 auto;padding:32px 20px}
     header{text-align:center;margin-bottom:36px}
-    header h1{font-size:2.6em;font-weight:800;color:#b33a2b;letter-spacing:.04em}
-    header h1 span{color:#d4a853}
-    header p{font-size:1.05em;color:#6b6356;margin-top:4px}
-    header .subtitle{font-size:.82em;color:#a09882;margin-top:8px}
-    .card{background:white;border-radius:4px;padding:28px 32px;box-shadow:0 2px 12px rgba(60,40,20,.08);margin-bottom:20px;border:1px solid #e8e0d4}
+    header h1{font-size:2.6em;font-weight:800;color:var(--color-primary);letter-spacing:.04em}
+    header h1 span{color:var(--color-accent)}
+    header p{font-size:1.05em;color:var(--color-text-secondary);margin-top:4px}
+    header .subtitle{font-size:.82em;color:var(--color-text-muted);margin-top:8px}
+    .card{background:var(--color-bg-card);border-radius:var(--radius-sm);padding:28px 32px;box-shadow:var(--shadow-md);margin-bottom:20px;border:1px solid var(--color-border)}
     .form-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
     .form-group{flex:1;min-width:170px}
-    label{display:block;font-weight:600;margin-bottom:5px;color:#4a4438;font-size:.92em}
-    select,input[type="number"]{width:100%;padding:10px 14px;border:1.5px solid #d5cfc3;border-radius:3px;font-size:1.05em;transition:border-color .2s;outline:none;background:#fdfbf7;color:#2c2c2c}
-    select:focus,input:focus{border-color:#b33a2b;background:white}
-    button{width:100%;padding:14px;background:#b33a2b;color:white;border:none;border-radius:3px;font-size:1.15em;font-weight:700;cursor:pointer;letter-spacing:.06em;transition:background .2s}
-    button:hover{background:#9a3024}
-    button:active{background:#832820}
+    label{display:block;font-weight:600;margin-bottom:5px;color:var(--color-text-label);font-size:.92em}
+    select,input[type="number"]{width:100%;padding:10px 14px;border:1.5px solid var(--color-border-input);border-radius:var(--radius-sm);font-size:1.05em;transition:border-color var(--transition-normal);outline:none;background:var(--color-bg-input);color:var(--color-text)}
+    select:focus,input:focus{border-color:var(--color-primary);background:white}
+    button{width:100%;padding:14px;background:var(--color-primary);color:white;border:none;border-radius:var(--radius-sm);font-size:1.15em;font-weight:700;cursor:pointer;letter-spacing:.06em;transition:background var(--transition-normal)}
+    button:hover{background:var(--color-primary-hover)}
+    button:active{background:var(--color-primary-active)}
+    button:focus-visible,select:focus-visible,input:focus-visible,.filter-chip:focus-visible,.quick-btn:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
     .tier-section{margin-bottom:24px}
-    .tier-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #eee}
+    .tier-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--color-border)}
     .tier-icon{font-size:1.5em}
     .tier-label{font-size:1.3em;font-weight:700}
-    .tier-desc{color:#a09882;font-size:.85em}
-    .tier-reach .tier-header{border-color:#c0392b}
-    .tier-match .tier-header{border-color:#27ae60}
-    .tier-safety .tier-header{border-color:#2980b9}
-    .school-card{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin-bottom:6px;border-radius:3px;background:#faf8f4;transition:background .15s;border:1px solid transparent}
-    .school-card:hover{background:#f0ebe1;border-color:#d5cfc3}
+    .tier-desc{color:var(--color-text-muted);font-size:.85em}
+    .tier-reach .tier-header{border-color:var(--color-reach)}
+    .tier-match .tier-header{border-color:var(--color-match)}
+    .tier-safety .tier-header{border-color:var(--color-safety)}
+    .school-card{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin-bottom:6px;border-radius:var(--radius-sm);background:#faf8f4;transition:background var(--transition-fast);border:1px solid transparent}
+    .school-card:hover{background:#f0ebe1;border-color:var(--color-border-input)}
     .school-name{font-weight:600;font-size:1.05em}
     .school-meta{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap}
     .badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:.75em;font-weight:600}
     .badge-985{background:#f5e6d0;color:#8b5a2b}
     .badge-211{background:#dce8d5;color:#3a6b24}
-    .badge-city{background:#dde5ed;color:#2c5282}
+    .badge-city{background:var(--color-bg-subtle);color:#2c5282}
     .badge-tag{background:#ede4d8;color:#7a5c3e}
     .school-score{text-align:right;min-width:80px}
-    .score-value{font-size:1.4em;font-weight:700;color:#2c2c2c}
+    .score-value{font-size:1.4em;font-weight:700;color:var(--color-text)}
     .score-diff{font-size:.85em;margin-top:2px}
-    .diff-pos{color:#c0392b}
-    .diff-neg{color:#27ae60}
-    .diff-zero{color:#8a8275}
-    .info-bar{background:#f5f0e8;border-radius:3px;padding:14px 18px;margin-bottom:22px;font-size:.95em;color:#4a4438;line-height:1.6;border-left:3px solid #d4a853}
-    .empty-state{text-align:center;padding:40px;color:#a09882}
+    .diff-pos{color:var(--color-reach)}
+    .diff-neg{color:var(--color-match)}
+    .diff-zero{color:var(--color-text-muted)}
+    .info-bar{background:var(--color-bg);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:22px;font-size:.95em;color:var(--color-text-label);line-height:1.6;border-left:3px solid var(--color-accent)}
+    .empty-state{text-align:center;padding:40px;color:var(--color-text-muted)}
     .loading{text-align:center;padding:40px}
-    .loading .spinner{display:inline-block;width:40px;height:40px;border:3px solid #e8e0d4;border-top:3px solid #b33a2b;border-radius:50%;animation:spin .8s linear infinite}
+    .loading .spinner{display:inline-block;width:40px;height:40px;border:3px solid var(--color-border);border-top:3px solid var(--color-primary);border-radius:50%;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .footer{text-align:center;color:#a09882;font-size:.8em;margin-top:40px;padding:20px}
-    .footer a{color:#8b7b6b}
+    .footer{text-align:center;color:var(--color-text-muted);font-size:.8em;margin-top:40px;padding:20px}
+    .footer a{color:var(--color-text-label)}
     .insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .insight-card{background:white;border-radius:6px;padding:18px;cursor:pointer;transition:all .2s;border:1px solid #e8e0d4;position:relative;overflow:hidden}
+    .insight-card{background:var(--color-bg-card);border-radius:var(--radius-md);padding:18px;cursor:pointer;transition:all var(--transition-normal);border:1px solid var(--color-border);position:relative;overflow:hidden}
     .insight-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(60,40,20,.1)}
     .insight-card .insight-icon{font-size:1.8em;margin-bottom:6px}
-    .insight-card .insight-title{font-weight:700;font-size:1.05em;color:#2c2c2c;margin-bottom:4px}
-    .insight-card .insight-brief{font-size:.88em;color:#6b6356;line-height:1.4}
-    .insight-card .insight-brief strong{color:#b33a2b;font-size:1.2em}
-    .insight-card .insight-detail{max-height:0;overflow:hidden;transition:max-height .3s ease,margin-top .3s ease;font-size:.85em;color:#4a4438;line-height:1.6;margin-top:0}
+    .insight-card .insight-title{font-weight:700;font-size:1.05em;color:var(--color-text);margin-bottom:4px}
+    .insight-card .insight-brief{font-size:.88em;color:var(--color-text-secondary);line-height:1.4}
+    .insight-card .insight-brief strong{color:var(--color-primary);font-size:1.2em}
+    .insight-card .insight-detail{max-height:0;overflow:hidden;transition:max-height .3s ease,margin-top .3s ease;font-size:.85em;color:var(--color-text-label);line-height:1.6;margin-top:0}
     .insight-card.expanded .insight-detail{max-height:200px;margin-top:10px}
     .insight-card::after{content:'点击展开';position:absolute;top:12px;right:12px;font-size:.7em;color:#b8b0a0;transition:opacity .2s}
     .insight-card.expanded::after{opacity:0}
     .how-it-works{display:flex;gap:20px;margin-bottom:24px;text-align:center}
     .how-step{flex:1;padding:20px 12px}
     .how-step .step-icon{font-size:2em;margin-bottom:8px}
-    .how-step h3{font-size:1em;margin-bottom:4px;color:#2c2c2c}
-    .how-step p{font-size:.85em;color:#a09882}
+    .how-step h3{font-size:1em;margin-bottom:4px;color:var(--color-text)}
+    .how-step p{font-size:.85em;color:var(--color-text-muted)}
     .quick-examples{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-    .quick-btn{flex:1;min-width:140px;padding:10px 14px;background:#f5f0e8;border:1.5px solid #d5cfc3;border-radius:3px;cursor:pointer;font-size:.9em;color:#4a4438;transition:all .15s;text-align:center}
-    .quick-btn:hover{border-color:#b33a2b;background:#ede4d8}
-    .quick-btn .ex-score{font-size:1.3em;font-weight:700;color:#b33a2b}
+    .quick-btn{flex:1;min-width:140px;padding:10px 14px;background:var(--color-bg);border:1.5px solid var(--color-border-input);border-radius:var(--radius-sm);cursor:pointer;font-size:.9em;color:var(--color-text-label);transition:all var(--transition-fast);text-align:center;min-height:44px}
+    .quick-btn:hover{border-color:var(--color-primary);background:#ede4d8}
+    .quick-btn .ex-score{font-size:1.3em;font-weight:700;color:var(--color-primary)}
     .trust-row{display:flex;gap:16px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-    .trust-item{background:rgba(0,0,0,.04);border-radius:3px;padding:10px 18px;font-size:.85em;color:#6b6356}
-    .trust-item strong{font-size:1.2em;display:block;color:#b33a2b}
+    .trust-item{background:rgba(0,0,0,.04);border-radius:3px;padding:10px 18px;font-size:.85em;color:var(--color-text-secondary)}
+    .trust-item strong{font-size:1.2em;display:block;color:var(--color-primary)}
     .sparkline{margin-top:3px;display:inline-block;vertical-align:middle}
     .trend-badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:.7em;font-weight:600;margin-left:6px;vertical-align:middle}
     .trend-up{background:#f5e6d0;color:#8b5a2b}
     .trend-down{background:#dce8d5;color:#3a6b24}
-    .trend-stable{background:#ede8df;color:#8a8275}
+    .trend-stable{background:var(--color-bg-subtle);color:var(--color-text-muted)}
     .summary-bar{display:flex;gap:24px;justify-content:center;margin:16px 0;flex-wrap:wrap}
     .summary-item{text-align:center}
     .summary-num{font-size:2em;font-weight:700}
-    .summary-label{font-size:.85em;color:#8a8275}
+    .summary-label{font-size:.85em;color:var(--color-text-muted)}
     .countdown-banner{background:linear-gradient(135deg,#b33a2b,#d4a853);color:white;padding:14px 20px;border-radius:6px;text-align:center;margin-bottom:20px;animation:pulse-border 2s ease-in-out infinite}
     .countdown-banner .countdown-title{font-size:1.15em;font-weight:700;margin-bottom:4px}
     .countdown-banner .countdown-sub{font-size:.88em;opacity:.9}
     .countdown-banner .countdown-date{font-size:1.3em;font-weight:800;letter-spacing:.02em}
     @keyframes pulse-border{0%,100%{box-shadow:0 2px 12px rgba(179,58,43,.2)}50%{box-shadow:0 4px 24px rgba(179,58,43,.35)}}
     .report-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
-    .report-card{background:white;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;border-radius:8px;padding:32px;box-shadow:0 8px 40px rgba(0,0,0,.2)}
-    .report-card h2{text-align:center;color:#b33a2b;margin-bottom:4px;font-size:1.5em}
-    .report-card .report-meta{text-align:center;color:#6b6356;font-size:.9em;margin-bottom:20px}
+    .report-card{background:white;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;border-radius:var(--radius-md);padding:32px;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+    .report-card h2{text-align:center;color:var(--color-primary);margin-bottom:4px;font-size:1.5em}
+    .report-card .report-meta{text-align:center;color:var(--color-text-secondary);font-size:.9em;margin-bottom:20px}
     .report-card .report-tier{margin-bottom:16px}
-    .report-card .report-tier h4{font-size:1em;padding-bottom:6px;border-bottom:2px solid #eee;margin-bottom:8px}
-    .report-card .report-school{display:flex;justify-content:space-between;padding:6px 0;font-size:.9em;border-bottom:1px solid #f5f0e8}
+    .report-card .report-tier h4{font-size:1em;padding-bottom:6px;border-bottom:2px solid var(--color-border);margin-bottom:8px}
+    .report-card .report-school{display:flex;justify-content:space-between;padding:6px 0;font-size:.9em;border-bottom:1px solid var(--color-bg)}
     .report-card .report-school:last-child{border-bottom:none}
     .report-card .report-actions{display:flex;gap:10px;margin-top:20px;justify-content:center}
-    .report-card .report-actions button{flex:1;max-width:200px;padding:12px;border:none;border-radius:4px;font-size:1em;font-weight:600;cursor:pointer}
+    .report-card .report-actions button{flex:1;max-width:200px;padding:12px;border:none;border-radius:var(--radius-sm);font-size:1em;font-weight:600;cursor:pointer;min-height:44px}
     .filter-panel{max-height:0;overflow:hidden;transition:max-height .3s ease;margin-top:0}
     .filter-panel.open{max-height:600px;margin-top:16px}
-    .filter-toggle{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f5f0e8;border:1.5px solid #d5cfc3;border-radius:3px;cursor:pointer;font-size:.88em;color:#4a4438;transition:all .15s;margin-top:12px}
-    .filter-toggle:hover{border-color:#b33a2b;background:#ede4d8}
-    .filter-toggle .filter-count{background:#b33a2b;color:white;border-radius:10px;padding:1px 7px;font-size:.75em;font-weight:700;display:none}
+    .filter-toggle{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--color-bg);border:1.5px solid var(--color-border-input);border-radius:var(--radius-sm);cursor:pointer;font-size:.88em;color:var(--color-text-label);transition:all var(--transition-fast);margin-top:12px}
+    .filter-toggle:hover{border-color:var(--color-primary);background:#ede4d8}
+    .filter-toggle .filter-count{background:var(--color-primary);color:white;border-radius:10px;padding:1px 7px;font-size:.75em;font-weight:700;display:none}
     .filter-toggle .filter-count.show{display:inline}
     .filter-section{margin-bottom:14px}
-    .filter-section-label{font-size:.82em;font-weight:700;color:#8a8275;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+    .filter-section-label{font-size:.82em;font-weight:700;color:var(--color-text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
     .filter-chips{display:flex;flex-wrap:wrap;gap:6px}
-    .filter-chip{padding:5px 12px;border-radius:14px;font-size:.82em;cursor:pointer;border:1.5px solid #d5cfc3;background:white;color:#4a4438;transition:all .15s;user-select:none}
-    .filter-chip:hover{border-color:#b33a2b}
-    .filter-chip.active{background:#b33a2b;color:white;border-color:#b33a2b}
+    .filter-chip{padding:8px 12px;border-radius:14px;font-size:.82em;cursor:pointer;border:1.5px solid var(--color-border-input);background:var(--color-bg-card);color:var(--color-text-label);transition:all var(--transition-fast);user-select:none;min-height:36px}
+    .filter-chip:hover{border-color:var(--color-primary)}
+    .filter-chip.active{background:var(--color-primary);color:white;border-color:var(--color-primary)}
     .filter-chip .chip-count{font-size:.8em;opacity:.7;margin-left:3px}
-    .filter-clear{font-size:.82em;color:#b33a2b;cursor:pointer;border:none;background:none;padding:4px 8px;text-decoration:underline}
+    .filter-clear{font-size:.82em;color:var(--color-primary);cursor:pointer;border:none;background:none;padding:4px 8px;text-decoration:underline}
     .filter-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-    .filter-summary{font-size:.85em;color:#8a8275}
-    .filter-summary strong{color:#4a4438}
+    .filter-summary{font-size:.85em;color:var(--color-text-muted)}
+    .filter-summary strong{color:var(--color-text-label)}
     @media print{
       body{background:white!important}
       .container{max-width:100%;padding:0}
@@ -146,6 +187,11 @@
       .card{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid}
       .school-card{page-break-inside:avoid}
       #results{display:block!important}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
+      .countdown-banner{animation:none}
+      .loading .spinner{animation:none;border-top-color:var(--color-primary)}
     }
     @media(max-width:600px){
       .container{padding:20px 12px}
@@ -164,15 +210,15 @@
   </style>
 </head>
 <body>
-  <div id="loading-overlay" style="position:fixed;top:0;left:0;right:0;z-index:1000;background:#f5f0e8;padding:0">
-    <div id="load-progress" style="height:3px;background:#b33a2b;width:0;transition:width .1s"></div>
-    <div id="load-progress-text" style="text-align:center;font-size:.8em;color:#a09882;padding:4px 0"></div>
+  <div id="loading-overlay" style="position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--color-bg);padding:0">
+    <div id="load-progress" style="height:3px;background:var(--color-primary);width:0;transition:width .1s"></div>
+      <div id="load-progress-text" style="text-align:center;font-size:.8em;color:var(--color-text-muted);padding:4px 0"></div>
   </div>
   <div class="container">
     <header>
-      <h1>⭐ 志愿<span>星</span></h1>
+      <h1><svg width="32" height="32" viewBox="0 0 24 24" fill="var(--color-accent)" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-6px;margin-right:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>志愿<span>星</span></h1>
       <p style="font-size:1.3em;font-weight:600;margin-bottom:4px">考多少分，上什么大学</p>
-      <p style="font-size:1em;color:#6b6356">免费查询 · 真实数据 · 冲/稳/保 一键推荐</p>
+      <p style="font-size:1em;color:var(--color-text-secondary)">免费查询 · 真实数据 · 冲/稳/保 一键推荐</p>
       <div class="trust-row" id="trust-row">
         <div class="trust-item"><strong id="t-unis">899</strong>所高校</div>
         <div class="trust-item"><strong id="t-entries">260,955</strong>条录取数据</div>
@@ -182,44 +228,44 @@
     </header>
 
     <div class="countdown-banner" id="countdown-banner">
-      <div class="countdown-title">📍 2026 高考成绩即将公布</div>
+      <div class="countdown-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>2026 高考成绩即将公布</div>
       <div class="countdown-sub">预计各省 6月23-25日起陆续查询</div>
       <div class="countdown-date" id="countdown-text"></div>
     </div>
 
     <div class="card">
       <div class="how-it-works">
-        <div class="how-step"><div class="step-icon">📍</div><h3>选省份</h3><p>自动适配新高考</p></div>
-        <div class="how-step"><div class="step-icon">📊</div><h3>输分数</h3><p>200-900分均可</p></div>
-        <div class="how-step"><div class="step-icon">🎯</div><h3>看推荐</h3><p>冲一冲·稳一稳·保一保</p></div>
+        <div class="how-step"><div class="step-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h3>选省份</h3><p>自动适配新高考</p></div>
+        <div class="how-step"><div class="step-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg></div><h3>输分数</h3><p>200-900分均可</p></div>
+        <div class="how-step"><div class="step-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><h3>看推荐</h3><p>冲一冲·稳一稳·保一保</p></div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>📍 省份</label>
+          <label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>省份</label>
           <select id="province"></select>
         </div>
         <div class="form-group">
-          <label>📊 高考分数</label>
+          <label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>高考分数</label>
           <input type="number" id="score" min="200" max="750" placeholder="例：620" />
-          <small id="score-hint" style="color:#a09882;font-size:.8em;display:none">海南满分900</small>
+          <small id="score-hint" style="color:var(--color-text-muted);font-size:.8em;display:none">海南满分900</small>
         </div>
         <div class="form-group">
-          <label>🏆 位次 <small style="color:#a09882;">（选填，更准）</small></label>
+          <label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>位次 <small style="color:var(--color-text-muted)">（选填，更准）</small></label>
           <input type="number" id="rank" min="1" placeholder="例：5000" />
-          <small style="color:#a09882;font-size:.8em">位次比分数更稳定，优先填写</small>
+          <small style="color:var(--color-text-muted);font-size:.8em">位次比分数更稳定，优先填写</small>
         </div>
         <div class="form-group">
-          <label id="subject-label">📚 科类</label>
+          <label id="subject-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>科类</label>
           <select id="subject">
             <option value="物理类">物理类</option>
             <option value="历史类">历史类</option>
           </select>
-          <small id="subject-hint" style="color:#a09882;font-size:.8em;display:none">3+3省份不分文理</small>
+          <small id="subject-hint" style="color:var(--color-text-muted);font-size:.8em;display:none">3+3省份不分文理</small>
         </div>
       </div>
-      <button onclick="doSearch()">🔍 查询推荐</button>
+      <button onclick="doSearch()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>查询推荐</button>
       <div class="filter-toggle" onclick="toggleFilters()">
-        🎛️ 筛选条件 <span class="filter-count" id="filter-count"></span> <span id="filter-arrow">▼</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg> 筛选条件 <span class="filter-count" id="filter-count"></span> <span id="filter-arrow">▼</span>
       </div>
       <div class="filter-panel" id="filter-panel">
         <div class="filter-bar">
@@ -227,23 +273,23 @@
           <button class="filter-clear" onclick="clearFilters()">清除全部</button>
         </div>
         <div class="filter-section">
-          <div class="filter-section-label">🏷️ 学校层次</div>
+          <div class="filter-section-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>学校层次</div>
           <div class="filter-chips" id="tier-chips"></div>
         </div>
         <div class="filter-section">
-          <div class="filter-section-label">📍 地区 <span id="region-hint" style="font-size:.9em;font-weight:400;color:#a09882"></span></div>
+          <div class="filter-section-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>地区 <span id="region-hint" style="font-size:.9em;font-weight:400;color:var(--color-text-muted)"></span></div>
           <div class="filter-chips" id="region-chips"></div>
           <div id="city-area" style="display:none;margin-top:8px">
             <div class="filter-chips" id="city-chips"></div>
           </div>
         </div>
         <div class="filter-section">
-          <div class="filter-section-label">🎓 学校类型</div>
+          <div class="filter-section-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 6 3 6 3s3 0 6-3v-5"/></svg>学校类型</div>
           <div class="filter-chips" id="group-chips"></div>
         </div>
       </div>
       <div style="margin-top:16px">
-        <p style="font-size:.85em;color:#a09882;margin-bottom:8px">💡 试试看（点击即查）：</p>
+        <p style="font-size:.85em;color:var(--color-text-muted);margin-bottom:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>试试看（点击即查）：</p>
         <div class="quick-examples">
           <div class="quick-btn" onclick="quickSearch('河南',620,'物理类')"><div class="ex-score">620</div>河南·物理类</div>
           <div class="quick-btn" onclick="quickSearch('四川',580,'历史类')"><div class="ex-score">580</div>四川·历史类</div>
@@ -256,43 +302,43 @@
     <div id="results"></div>
 
     <div class="card" id="insights-card" style="background:linear-gradient(135deg,#fdfbf7 0%,#f5f0e8 100%);border:1px solid #e8dfd0">
-      <h3 style="text-align:center;font-size:1.3em;margin-bottom:6px;color:#2c2c2c">📊 数据发现</h3>
-      <p style="text-align:center;font-size:.88em;color:#a09882;margin-bottom:20px">来自 260,955 条真实录取数据的 4 个反直觉发现</p>
+      <h3 style="text-align:center;font-size:1.3em;margin-bottom:6px;color:var(--color-text)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:6px"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>数据发现</h3>
+      <p style="text-align:center;font-size:.88em;color:var(--color-text-muted);margin-bottom:20px">来自 260,955 条真实录取数据的 4 个反直觉发现</p>
       <div class="insights-grid">
         <div class="insight-card" onclick="this.classList.toggle('expanded')">
-          <div class="insight-icon">🏷️</div>
+          <div class="insight-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg></div>
           <div class="insight-title">标签不等于实力</div>
           <div class="insight-brief"><strong>49</strong> 所 211 比最容易的 985 还难考</div>
           <div class="insight-detail">
             <p>985→211 平均差距 51 分，但 211→双一流只差 1 分。北京邮电（211，612分）比西北农林（985，572分）难 40 分。</p>
-            <p style="margin-top:6px;color:#8b5a2b">💡 别只盯标签，看分数和城市更实在。</p>
+            <p style="margin-top:6px;color:#8b5a2b"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>别只盯标签，看分数和城市更实在。</p>
           </div>
         </div>
         <div class="insight-card" onclick="this.classList.toggle('expanded')">
-          <div class="insight-icon">🏙️</div>
+          <div class="insight-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg></div>
           <div class="insight-title">城市溢价 ≈ 30 分</div>
           <div class="insight-brief">同一级别学校，大城市贵 <strong>~30</strong> 分</div>
           <div class="insight-detail">
             <p>北京校平均 615 分，上海 613 分。同样的 211 标签，在省会可能只要 570。这 30 分买的是实习机会和人脉网络。</p>
-            <p style="margin-top:6px;color:#8b5a2b">💡 如果分数有限，选好城市的普通校 vs 小城市的名校，是真正的权衡。</p>
+            <p style="margin-top:6px;color:#8b5a2b"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>如果分数有限，选好城市的普通校 vs 小城市的名校，是真正的权衡。</p>
           </div>
         </div>
         <div class="insight-card" onclick="this.classList.toggle('expanded')">
-          <div class="insight-icon">💎</div>
+          <div class="insight-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
           <div class="insight-title">隐藏宝藏 211</div>
           <div class="insight-brief">8 所 211 大学 <strong>500 分</strong>就能上</div>
           <div class="insight-detail">
             <p>延边大学（501）、西藏大学（504）、石河子大学（508）、海南大学（527）等——211 毕业证对简历筛选很重要，这些是真正的"性价比之王"。</p>
-            <p style="margin-top:6px;color:#8b5a2b">💡 代价是偏远地区。但对中分段考生，这是用 500 分拿 211 文凭的机会。</p>
+            <p style="margin-top:6px;color:#8b5a2b"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>代价是偏远地区。但对中分段考生，这是用 500 分拿 211 文凭的机会。</p>
           </div>
         </div>
         <div class="insight-card" onclick="this.classList.toggle('expanded')">
-          <div class="insight-icon">👑</div>
+          <div class="insight-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></div>
           <div class="insight-title">真正的全国第一</div>
           <div class="insight-brief">国科大平均 <strong>690 分</strong>，超过清华北大</div>
           <div class="insight-detail">
             <p>中国科学院大学不是 985，只招 400 人/年，但录取分比清华（678）还高 12 分。小而精的极致。</p>
-            <p style="margin-top:6px;color:#8b5a2b">💡 "双一流"标签下藏着真正的王者。报志愿时别被标签限制了视野。</p>
+            <p style="margin-top:6px;color:#8b5a2b"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>"双一流"标签下藏着真正的王者。报志愿时别被标签限制了视野。</p>
           </div>
         </div>
       </div>
@@ -301,48 +347,60 @@
     <div class="card" style="background:#f8f9fa">
       <h3 style="margin-bottom:16px;text-align:center">为什么用志愿星？</h3>
       <div class="how-it-works">
-        <div class="how-step"><div class="step-icon">📊</div><h3>真实数据</h3><p>2022-2025年百度高考<br>录取分数线，不是模拟</p></div>
-        <div class="how-step"><div class="step-icon">⚡</div><h3>秒出结果</h3><p>输入分数即出推荐<br>不用填一堆问卷</p></div>
-        <div class="how-step"><div class="step-icon">🆓</div><h3>完全免费</h3><p>没有会员、没有广告<br>没有套路</p></div>
+        <div class="how-step"><div class="step-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg></div><h3>真实数据</h3><p>2022-2025年百度高考<br>录取分数线，不是模拟</p></div>
+        <div class="how-step"><div class="step-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3>秒出结果</h3><p>输入分数即出推荐<br>不用填一堆问卷</p></div>
+        <div class="how-step"><div class="step-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><h3>完全免费</h3><p>没有会员、没有广告<br>没有套路</p></div>
       </div>
     </div>
 
     <div class="footer">
-      <p style="margin-bottom:8px">⭐ 志愿星 — 让每个分数都有好学校</p>
+      <p style="margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-accent)" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>志愿星 — 让每个分数都有好学校</p>
       <p>数据来源：百度高考 · 2022-2025年真实录取分数线 · 899所高校 · 26万条数据 · 仅供参考</p>
-      <p style="margin-top:8px"><a href="insights.html" style="color:#b33a2b;font-weight:600">📊 查看数据真相报告 →</a></p>
-      <p style="margin-top:4px"><a href="converter.html" style="color:#b33a2b;font-weight:600">🔄 跨省分数换算 →</a></p>
+      <p style="margin-top:8px"><a href="insights.html" style="color:var(--color-primary);font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>查看数据真相报告 →</a></p>
+      <p style="margin-top:4px"><a href="converter.html" style="color:var(--color-primary);font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>跨省分数换算 →</a></p>
       <p style="margin-top:4px">觉得有用？转发给身边高考的小伙伴 →</p>
     </div>
 
     <div class="card" id="guide-card" style="background:#fdfbf7;border:1px solid #e8dfd0;margin-top:24px">
-      <h3 style="text-align:center;font-size:1.2em;margin-bottom:16px;color:#2c2c2c">📖 志愿填报小指南</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:.9em;line-height:1.7;color:#4a4438">
+      <h3 style="text-align:center;font-size:1.2em;margin-bottom:16px;color:var(--color-text)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>志愿填报小指南</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:.9em;line-height:1.7;color:var(--color-text-label)">
         <div>
-          <p style="font-weight:700;color:#b33a2b;margin-bottom:6px">🔥 冲一冲 怎么用？</p>
+          <p style="font-weight:700;color:var(--color-primary);margin-bottom:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>冲一冲 怎么用？</p>
           <p>选 2-3 所你最想去的学校。分数线比你高 5-25 分，不是没可能——每年都有波动。万一录到就是赚到，没录到不影响后面的志愿。</p>
         </div>
         <div>
-          <p style="font-weight:700;color:#2c7a3e;margin-bottom:6px">✅ 稳一稳 怎么用？</p>
+          <p style="font-weight:700;color:#2c7a3e;margin-bottom:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>稳一稳 怎么用？</p>
           <p>选 3-4 所和你分数匹配的学校。这些是你的"主战场"——录取概率最大，也是你最该花时间研究的。重点看专业、城市、就业。</p>
         </div>
         <div>
-          <p style="font-weight:700;color:#2c5282;margin-bottom:6px">🛡️ 保一保 怎么用？</p>
+          <p style="font-weight:700;color:#2c5282;margin-bottom:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>保一保 怎么用？</p>
           <p>选 2-3 所分数低于你的学校。确保兜底，别掉档。"保"不是将就——选一个你能接受的学校和喜欢的专业，比冲一个好学校被调剂更值。</p>
         </div>
         <div>
-          <p style="font-weight:700;color:#6b4c8a;margin-bottom:6px">💡 几个实用建议</p>
+          <p style="font-weight:700;color:#6b4c8a;margin-bottom:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>几个实用建议</p>
           <p>① 位次比分数更准，能查到就填<br>
           ② 同一所学校不同专业分差可达 30+<br>
           ③ 城市 > 标签（实习和就业机会）<br>
           ④ 别全冲也别全保，比例 3:4:3 最稳</p>
         </div>
       </div>
-      <p style="text-align:center;font-size:.8em;color:#a09882;margin-top:14px">以上为经验性建议，实际填报请结合本省招生政策和官方指南</p>
+      <p style="text-align:center;font-size:.8em;color:var(--color-text-muted);margin-top:14px">以上为经验性建议，实际填报请结合本省招生政策和官方指南</p>
     </div>
   </div>
 
   <script>
+  // === SVG Icon Helpers ===
+  const ICONS = {
+    fire: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+    check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    shield: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    search: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+    chart: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>',
+    copy: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+    star: '<svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-accent)" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+    printer: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>',
+  };
+
   // === Data (loaded async) ===
   let DATA = null;
   const UNIVERSITIES = {};
@@ -549,16 +607,16 @@
     let level, label;
     if (cv <= provMean * 0.8) {
       level = 'stable';
-      label = `✅ 比本省多数学校稳定（${ranks.length}年波动 ${pctStr}）${noiseCtx}`;
+      label = `${ICONS.check} 比本省多数学校稳定（${ranks.length}年波动 ${pctStr}）${noiseCtx}`;
     } else if (cv >= provMean * 2.0) {
       level = 'volatile';
-      label = `⚠️ 波动显著高于本省平均（${ranks.length}年 CV=${cv.toFixed(2)}，本省均值 ${provMean.toFixed(2)}）${noiseCtx}`;
+      label = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>波动显著高于本省平均（${ranks.length}年 CV=${cv.toFixed(2)}，本省均值 ${provMean.toFixed(2)}）${noiseCtx}`;
     } else if (cv >= provMean * 1.3) {
       level = 'moderate';
-      label = `📊 略高于本省平均（${ranks.length}年 CV=${cv.toFixed(2)}，本省均值 ${provMean.toFixed(2)}）${noiseCtx}`;
+      label = `${ICONS.chart} 略高于本省平均（${ranks.length}年 CV=${cv.toFixed(2)}，本省均值 ${provMean.toFixed(2)}）${noiseCtx}`;
     } else {
       level = 'stable';
-      label = `✅ 与本省平均持平（${ranks.length}年波动 ${pctStr}）${noiseCtx}`;
+      label = `${ICONS.check} 与本省平均持平（${ranks.length}年波动 ${pctStr}）${noiseCtx}`;
     }
 
     return { cv: cvRound, level, label, provMean };
@@ -582,7 +640,7 @@
       return `<circle cx="${x}" cy="${y}" r="2" fill="${color}"/>`;
     }).join('');
     const years = history.map(h => h.year);
-    return `<svg class="sparkline" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${color}" stroke-width="1.5" points="${pts.join(' ')}"/>${circles}</svg><span style="font-size:.65em;color:#a09882;margin-left:2px">${years[0]}'→${years[years.length-1]}'</span>`;
+    return `<svg class="sparkline" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${color}" stroke-width="1.5" points="${pts.join(' ')}"/>${circles}</svg><span style="font-size:.65em;color:var(--color-text-muted);margin-left:2px">${years[0]}'→${years[years.length-1]}'</span>`;
   }
 
   // === Filters ===
@@ -968,7 +1026,7 @@
       return;
     }
 
-    div.innerHTML = '<div class="card"><div class="loading"><div class="spinner"></div><p style="margin-top:16px;color:#a09882">正在匹配...</p></div></div>';
+    div.innerHTML = '<div class="card"><div class="loading"><div class="spinner"></div><p style="margin-top:16px;color:var(--color-text-muted)">正在匹配...</p></div></div>';
 
     // Use requestAnimationFrame so the loading spinner shows
       requestAnimationFrame(() => {
@@ -983,13 +1041,13 @@
   function renderResults(data, container) {
     const useRank = data.useRank;
     const tiers = useRank ? [
-      { key: '冲一冲', icon: '🔥', css: 'tier-reach', desc: '该校录取位次优于你 — 冲一下有可能' },
-      { key: '稳一稳', icon: '✅', css: 'tier-match', desc: '该校录取位次与你匹配 — 比较稳妥' },
-      { key: '保一保', icon: '🛡️', css: 'tier-safety', desc: '该校录取位次低于你 — 保底选择' },
+      { key: '冲一冲', icon: ICONS.fire, css: 'tier-reach', desc: '该校录取位次优于你 — 冲一下有可能' },
+      { key: '稳一稳', icon: ICONS.check, css: 'tier-match', desc: '该校录取位次与你匹配 — 比较稳妥' },
+      { key: '保一保', icon: ICONS.shield, css: 'tier-safety', desc: '该校录取位次低于你 — 保底选择' },
     ] : [
-      { key: '冲一冲', icon: '🔥', css: 'tier-reach', desc: '分数线略高于你 — 冲一下有可能' },
-      { key: '稳一稳', icon: '✅', css: 'tier-match', desc: '分数线和你匹配 — 比较稳妥' },
-      { key: '保一保', icon: '🛡️', css: 'tier-safety', desc: '分数线低于你 — 保底选择' },
+      { key: '冲一冲', icon: ICONS.fire, css: 'tier-reach', desc: '分数线略高于你 — 冲一下有可能' },
+      { key: '稳一稳', icon: ICONS.check, css: 'tier-match', desc: '分数线和你匹配 — 比较稳妥' },
+      { key: '保一保', icon: ICONS.shield, css: 'tier-safety', desc: '分数线低于你 — 保底选择' },
     ];
 
     let total = 0;
@@ -998,13 +1056,13 @@
     let html = `<div class="card"><div class="info-bar">
       <strong>${data.province}</strong> · ${data.subject} · <strong>${data.score}分</strong>
       ${useRank ? ` · <strong>位次 ${data.rank}</strong>（按位次推荐）` : ''}
-      ${getActiveFilterCount() > 0 ? ` · 🔍 已筛选` : ''}
+      ${getActiveFilterCount() > 0 ? ` · ${ICONS.search} 已筛选` : ''}
       　共匹配到 <strong>${total}</strong> 所学校
-      <button id="share-btn" onclick="shareResult()" style="float:right;padding:6px 16px;background:#b33a2b;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em">📋 复制分享链接</button>
-      <button id="card-btn" onclick="generateCard()" style="float:right;padding:6px 16px;background:#d4a853;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em;margin-right:8px">📸 生成图片</button>
-      <button id="report-btn" onclick="showReport()" style="float:right;padding:6px 16px;background:#2c5282;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em;margin-right:8px">📄 保存报告</button>
+      <button id="share-btn" onclick="shareResult()" style="float:right;padding:6px 16px;background:var(--color-primary);color:white;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:.85em">${ICONS.copy} 复制分享链接</button>
+      <button id="card-btn" onclick="generateCard()" style="float:right;padding:6px 16px;background:var(--color-accent);color:white;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:.85em;margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>生成图片</button>
+      <button id="report-btn" onclick="showReport()" style="float:right;padding:6px 16px;background:#2c5282;color:white;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:.85em;margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>保存报告</button>
     </div>
-    ${data.provinceTotal < 3 ? '<div style="background:#f5e6d0;border-radius:3px;padding:10px 14px;margin-bottom:16px;font-size:.85em;color:#8b5a2b">⚠️ 该省份录取数据较少，部分学校显示的是全国平均分数作为参考（标有"参考"标签）</div>' : ''}
+    ${data.provinceTotal < 3 ? '<div style="background:#f5e6d0;border-radius:3px;padding:10px 14px;margin-bottom:16px;font-size:.85em;color:#8b5a2b"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>该省份录取数据较少，部分学校显示的是全国平均分数作为参考（标有"参考"标签）</div>' : ''}
     `;
 
     for (const tier of tiers) {
@@ -1017,12 +1075,12 @@
         </div>`;
 
       if (schools.length === 0) {
-        html += '<div style="padding:16px;color:#a09882;text-align:center">暂无匹配学校</div>';
+        html += '<div style="padding:16px;color:var(--color-text-muted);text-align:center">暂无匹配学校</div>';
       } else {
         for (const s of schools) {
           const tierBadge = s.tier === '985' ? '<span class="badge badge-985">985</span>'
                           : s.tier === '211' ? '<span class="badge badge-211">211</span>'
-                          : s.tier === '双一流' ? '<span class="badge" style="background:#dde5ed;color:#2c5282">双一流</span>' : '';
+                          : s.tier === '双一流' ? '<span class="badge" style="background:var(--color-bg-subtle);color:#2c5282">双一流</span>' : '';
           const tags = (s.tags || []).slice(0, 2).map(t => `<span class="badge badge-tag">${t}</span>`).join('');
           let diffClass, diffText, diffUnit;
           if (useRank && s.rank_ratio !== undefined) {
@@ -1034,8 +1092,8 @@
             diffText = s.diff > 0 ? `+${s.diff}` : `${s.diff}`;
             diffUnit = '分';
           }
-          const rankText = s.min_rank ? `<div style="font-size:.75em;color:#8a8275;margin-top:1px">≈${s.min_rank.toLocaleString()}位</div>` : '';
-          const yearTag = s.year ? `<span class="badge" style="background:#ede8df;color:#8a8275">${s.year}</span>` : '';
+          const rankText = s.min_rank ? `<div style="font-size:.75em;color:var(--color-text-muted);margin-top:1px">≈${s.min_rank.toLocaleString()}位</div>` : '';
+          const yearTag = s.year ? `<span class="badge" style="background:var(--color-bg-subtle);color:var(--color-text-muted)">${s.year}</span>` : '';
           const estTag = s.estimated ? '<span class="badge" style="background:#f5e6d0;color:#8b5a2b">参考</span>' : '';
 
           // Trend badge
@@ -1048,9 +1106,9 @@
           // Volatility badge — province-relative
           const volLevel = s.volatility_level || 'unknown';
           const volLabel = s.volatility_label || '';
-          const volBadge = volLevel === 'volatile' ? `<span class="trend-badge trend-up" title="${volLabel}">⚠️ 波动大</span>`
-                         : volLevel === 'stable' ? `<span class="trend-badge trend-stable" title="${volLabel}">✅ 稳定</span>`
-                         : volLevel === 'moderate' ? `<span class="trend-badge" style="background:#ede8df;color:#8a8275" title="${volLabel}">📊 中等</span>`
+          const volBadge = volLevel === 'volatile' ? `<span class="trend-badge trend-up" title="${volLabel}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:2px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>波动大</span>`
+                         : volLevel === 'stable' ? `<span class="trend-badge trend-stable" title="${volLabel}">${ICONS.check} 稳定</span>`
+                         : volLevel === 'moderate' ? `<span class="trend-badge" style="background:var(--color-bg-subtle);color:var(--color-text-muted)" title="${volLabel}">${ICONS.chart} 中等</span>`
                          : '';
 
           html += `<div class="school-card">
@@ -1139,8 +1197,8 @@
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url).then(() => {
         const btn = document.getElementById('share-btn');
-        btn.textContent = '✅ 已复制';
-        setTimeout(() => btn.textContent = '📋 复制分享链接', 2000);
+        btn.textContent = '✓ 已复制';
+        setTimeout(() => btn.textContent = ICONS.copy + ' 复制分享链接', 2000);
       });
     } else {
       prompt('复制链接分享：', url);
@@ -1152,9 +1210,9 @@
     const d = LAST_RESULTS;
     const W = 750;
     const tiers = [
-      { key: '冲一冲', icon: '🔥', color: '#c0392b', bg: '#fdf2f0' },
-      { key: '稳一稳', icon: '✅', color: '#27ae60', bg: '#f0faf4' },
-      { key: '保一保', icon: '🛡️', color: '#2980b9', bg: '#f0f5fa' },
+      { key: '冲一冲', icon: ICONS.fire, color: 'var(--color-reach)', bg: '#fdf2f0' },
+      { key: '稳一稳', icon: ICONS.check, color: 'var(--color-match)', bg: '#f0faf4' },
+      { key: '保一保', icon: ICONS.shield, color: 'var(--color-safety)', bg: '#f0f5fa' },
     ];
     // Collect top schools per tier
     const tierData = tiers.map(t => {
@@ -1194,7 +1252,7 @@
     ctx.fillStyle = '#d4a853';
     ctx.font = 'bold 28px "PingFang SC", "Microsoft YaHei", sans-serif';
     // star
-    ctx.fillText('⭐', 44 + ctx.measureText('志愿').width + 4, 62);
+    ctx.fillText('★', 44 + ctx.measureText('志愿').width + 4, 62);
 
     ctx.fillStyle = '#6b6356';
     ctx.font = '14px "PingFang SC", "Microsoft YaHei", sans-serif';
@@ -1310,8 +1368,8 @@
       a.download = `志愿星_${d.score}分_${d.province}.png`;
       a.click();
       URL.revokeObjectURL(url);
-      btn.textContent = '✅ 已保存';
-      setTimeout(() => btn.textContent = '📸 生成图片', 2500);
+      btn.textContent = '✓ 已保存';
+      setTimeout(() => btn.textContent = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>生成图片', 2500);
     }, 'image/png');
   }
 
@@ -1400,9 +1458,9 @@
     const data = LAST_RESULTS;
 
     const tiers = [
-      { key: '冲一冲', icon: '🔥', color: '#c0392b' },
-      { key: '稳一稳', icon: '✅', color: '#27ae60' },
-      { key: '保一保', icon: '🛡️', color: '#2980b9' },
+      { key: '冲一冲', icon: ICONS.fire, color: 'var(--color-reach)' },
+      { key: '稳一稳', icon: ICONS.check, color: 'var(--color-match)' },
+      { key: '保一保', icon: ICONS.shield, color: 'var(--color-safety)' },
     ];
 
     let schoolsHtml = '';
@@ -1428,16 +1486,16 @@
     const overlay = document.createElement('div');
     overlay.className = 'report-overlay';
     overlay.innerHTML = `<div class="report-card">
-      <h2>⭐ 志愿星 推荐报告</h2>
+      <h2>${ICONS.star} 志愿星 推荐报告</h2>
       <div class="report-meta">${data.province} · ${data.subject} · ${data.score}分${data.useRank ? ' · 位次'+data.rank : ''} · 共 ${total} 所推荐</div>
-      <div class="report-meta" style="font-size:.8em;color:#a09882;margin-top:-14px">${dateStr} · 数据来源：2022-2025年真实录取分数线</div>
+      <div class="report-meta" style="font-size:.8em;color:var(--color-text-muted);margin-top:-14px">${dateStr} · 数据来源：2022-2025年真实录取分数线</div>
       ${schoolsHtml}
-      <p style="font-size:.78em;color:#a09882;text-align:center;margin-top:12px">以上为 AI 参考推荐，实际填报请结合本省招生政策和官方数据</p>
-      <p style="font-size:.75em;color:#b8b0a0;text-align:center;margin-top:4px">🔗 ${url}</p>
+      <p style="font-size:.78em;color:var(--color-text-muted);text-align:center;margin-top:12px">以上为 AI 参考推荐，实际填报请结合本省招生政策和官方数据</p>
+      <p style="font-size:.75em;color:var(--color-text-muted);text-align:center;margin-top:4px">🔗 ${url}</p>
       <div class="report-actions">
-        <button onclick="window.print()" style="background:#b33a2b;color:white">🖨️ 打印</button>
-        <button onclick="copyReportLink()" style="background:#2c5282;color:white">📋 复制链接</button>
-        <button onclick="closeReport()" style="background:#e8e0d4;color:#4a4438">关闭</button>
+        <button onclick="window.print()" style="background:var(--color-primary);color:white">${ICONS.printer} 打印</button>
+        <button onclick="copyReportLink()" style="background:#2c5282;color:white">${ICONS.copy} 复制链接</button>
+        <button onclick="closeReport()" style="background:var(--color-bg);color:var(--color-text-label)">关闭</button>
       </div>
     </div>`;
     document.body.appendChild(overlay);
@@ -1456,8 +1514,8 @@
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url).then(() => {
         const btns = document.querySelectorAll('.report-actions button');
-        btns[1].textContent = '✅ 已复制';
-        setTimeout(() => btns[1].textContent = '📋 复制链接', 2000);
+        btns[1].textContent = '✓ 已复制';
+        setTimeout(() => btns[1].textContent = ICONS.copy + ' 复制链接', 2000);
       });
     }
   }
