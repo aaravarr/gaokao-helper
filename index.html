@@ -733,6 +733,16 @@
   }
 
   // === Algorithm ===
+  // Determine if a batch is "regular" (normal undergraduate admission) vs "special" (提前批, 国家专项, etc.)
+  const SPECIAL_BATCH_KEYWORDS = ['提前', '专项', '特殊', '预科', '定向', '高校', '免试', '少年班', '民族'];
+  function isRegularBatch(batch) {
+    if (!batch) return true;  // Unknown batch → treat as regular
+    // Must contain 本科 or be 平行录取
+    if (!batch.includes('本科') && !batch.includes('平行录取') && !batch.includes('本科段')) return false;
+    // Exclude special types
+    return !SPECIAL_BATCH_KEYWORDS.some(kw => batch.includes(kw));
+  }
+
   function recommend(score, province, subject, rank) {
     const is33 = PROVINCES_33.has(province);
     const accepted = SUBJECT_ALIASES[subject] || new Set([subject]);
@@ -756,15 +766,19 @@
       });
       if (subjectEntries.length === 0) continue;
 
-      // Find entries for this province specifically
+      // Find entries for this province specifically — prefer regular batches over special
       const provinceEntries = subjectEntries.filter(e => e.province === province);
-      let entry = provinceEntries.find(e => e.min_score != null);
+      const regularProvinceEntries = provinceEntries.filter(e => e.min_score != null && isRegularBatch(e.batch));
+      let entry = regularProvinceEntries.length > 0
+        ? regularProvinceEntries.reduce((best, e) => (!best || e.min_score < best.min_score) ? e : best, null)
+        : provinceEntries.find(e => e.min_score != null);  // Fallback to any batch
       
       if (entry && entry.min_score != null) {
         hasProvinceData = true;
       } else {
-        // Fallback: use average across other provinces (subject-matched)
-        const validEntries = subjectEntries.filter(e => e.min_score != null);
+        // Fallback: use average across other provinces (subject-matched, regular batches preferred)
+        const regularEntries = subjectEntries.filter(e => e.min_score != null && isRegularBatch(e.batch));
+        const validEntries = regularEntries.length > 0 ? regularEntries : subjectEntries.filter(e => e.min_score != null);
         if (validEntries.length === 0) continue;
         const avgScore = Math.round(validEntries.reduce((a, e) => a + e.min_score, 0) / validEntries.length);
         const avgRank = validEntries.find(e => e.min_rank)?.min_rank || null;
@@ -772,7 +786,7 @@
       }
 
       const diff = entry.min_score - score;
-      // Compute history from already-grouped entries (avoid O(260K) getHistory scan)
+      // Compute history from already-grouped entries (prefer regular batches)
       const histByYear = {};
       const histAccepted = SUBJECT_ALIASES[subject] || new Set([subject]);
       for (const e of entries) {
@@ -780,8 +794,15 @@
         if (!is33 && e.subject && !histAccepted.has(e.subject)) continue;
         if (e.min_score == null) continue;
         const y = e.year || 2024;
-        if (!histByYear[y] || e.min_score < histByYear[y].min_score) {
-          histByYear[y] = { year: y, min_score: e.min_score, min_rank: e.min_rank, batch: e.batch || '' };
+        // Prefer regular batches; only use special if no regular exists for this year
+        if (!histByYear[y]) {
+          histByYear[y] = { year: y, min_score: e.min_score, min_rank: e.min_rank, batch: e.batch || '', _regular: isRegularBatch(e.batch) };
+        } else if (isRegularBatch(e.batch)) {
+          if (!histByYear[y]._regular || e.min_score < histByYear[y].min_score) {
+            histByYear[y] = { year: y, min_score: e.min_score, min_rank: e.min_rank, batch: e.batch || '', _regular: true };
+          }
+        } else if (!histByYear[y]._regular && e.min_score < histByYear[y].min_score) {
+          histByYear[y] = { year: y, min_score: e.min_score, min_rank: e.min_rank, batch: e.batch || '', _regular: false };
         }
       }
       const history = Object.values(histByYear).sort((a, b) => a.year - b.year);
