@@ -32,88 +32,99 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* === Design Tokens — UI/UX Pro Max Design System === */
-      /* Color System: Educational Data-Heavy (Flat Design) */
-      /* Primary — Indigo: trustworthy, academic, data-focused */
-      --color-primary: #4F46E5;
-      --color-primary-hover: #4338CA;
-      --color-primary-active: #3730A3;
-      --color-primary-light: #EEF2FF;
-      --color-accent: #D97706;
-      --color-accent-light: #FFFBEB;
-      /* Background — Cool neutral, not warm */
-      --color-bg: #F8FAFC;
+      /* === Enterprise Design System — Alibaba Cloud Inspired === */
+      /* Primary — Ant Design Blue 6: trustworthy, professional */
+      --color-primary: #1677FF;
+      --color-primary-hover: #4096FF;
+      --color-primary-active: #0958D9;
+      --color-primary-light: #E6F4FF;
+      --color-primary-bg: #F0F7FF;
+      --color-accent: #FA8C16;
+      --color-accent-light: #FFF7E6;
+      /* Background — Enterprise neutral */
+      --color-bg: #F5F8FC;
       --color-bg-card: #FFFFFF;
-      --color-bg-input: #F8FAFC;
-      --color-bg-subtle: #F1F5F9;
+      --color-bg-input: #FAFBFC;
+      --color-bg-subtle: #F0F3F8;
       --color-bg-elevated: #FFFFFF;
-      /* Text — Slate scale */
-      --color-text: #0F172A;
-      --color-text-secondary: #475569;
-      --color-text-muted: #94A3B8;
-      --color-text-label: #334155;
-      /* Border */
-      --color-border: #E2E8F0;
-      --color-border-input: #CBD5E1;
-      /* Tier — Semantic: red/amber, green/success, blue/safety */
-      --color-reach: #DC2626;
-      --color-match: #16A34A;
-      --color-safety: #2563EB;
+      /* Text — Refined gray scale */
+      --color-text: #1D2129;
+      --color-text-secondary: #4E5969;
+      --color-text-muted: #86909C;
+      --color-text-label: #1D2129;
+      /* Border — Softer, more refined */
+      --color-border: #E5E8EF;
+      --color-border-input: #C9CDD4;
+      /* Tier — Semantic */
+      --color-reach: #F53F3F;
+      --color-match: #00B42A;
+      --color-safety: #1677FF;
       /* Data/Status */
-      --color-success: #16A34A;
-      --color-warning: #D97706;
-      --color-info: #2563EB;
-      /* Spacing — 8px grid system */
+      --color-success: #00B42A;
+      --color-warning: #FA8C16;
+      --color-info: #1677FF;
+      /* Spacing — 8px grid */
       --space-xs: 4px;
       --space-sm: 8px;
       --space-md: 16px;
       --space-lg: 24px;
       --space-xl: 32px;
       --space-2xl: 48px;
-      /* Radius — Flat design: subtle rounding */
+      --space-3xl: 64px;
+      /* Radius — Enterprise: slightly more rounded */
       --radius-sm: 6px;
       --radius-md: 8px;
       --radius-lg: 12px;
-      /* Shadows — None for flat design, minimal elevation */
-      --shadow-sm: 0 1px 2px rgba(15,23,42,.04);
-      --shadow-md: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
-      /* Transitions — Clean, fast */
-      --transition-fast: 150ms ease;
-      --transition-normal: 200ms ease;
+      /* Shadows — Multi-layer enterprise elevation */
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md: 0 2px 8px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-lg: 0 4px 16px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+      /* Transitions */
+      --transition-fast: 150ms cubic-bezier(.4,0,.2,1);
+      --transition-normal: 250ms cubic-bezier(.4,0,.2,1);
     }
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;background:var(--color-bg);min-height:100vh;color:var(--color-text);line-height:1.6;font-size:16px}
-    .container{max-width:920px;margin:0 auto;padding:var(--space-xl) var(--space-md)}
+    body{font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;background:var(--color-bg);min-height:100vh;color:var(--color-text);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--color-border);padding:0 var(--space-lg);height:56px;display:flex;align-items:center;justify-content:space-between}
+    .topbar-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.1em;color:var(--color-primary)}
+    .topbar-brand svg{flex-shrink:0}
+    .topbar-brand span{color:var(--color-accent)}
+    .topbar-stats{display:flex;gap:16px;font-size:.82em;color:var(--color-text-muted)}
+    .topbar-stats strong{color:var(--color-primary);font-weight:700}
+    .container{max-width:1040px;margin:0 auto;padding:var(--space-xl) var(--space-lg)}
     header{text-align:center;margin-bottom:var(--space-xl)}
-    header h1{font-size:2.4em;font-weight:800;color:var(--color-primary);letter-spacing:.02em}
-    header h1 span{color:var(--color-accent)}
+    header h1{font-size:2.6em;font-weight:800;color:var(--color-text);letter-spacing:.01em;line-height:1.2}
+    header h1 .brand-accent{color:var(--color-primary)}
+    header h1 .brand-star{color:var(--color-accent)}
     header p{font-size:1.05em;color:var(--color-text-secondary);margin-top:var(--space-xs)}
     header .subtitle{font-size:.85em;color:var(--color-text-muted);margin-top:var(--space-sm)}
-    .card{background:var(--color-bg-card);border-radius:var(--radius-md);padding:var(--space-lg) var(--space-xl);margin-bottom:var(--space-md);border:1px solid var(--color-border)}
+    .card{background:var(--color-bg-card);border-radius:var(--radius-lg);padding:var(--space-lg) var(--space-xl);margin-bottom:var(--space-md);border:1px solid var(--color-border);box-shadow:var(--shadow-sm);transition:box-shadow var(--transition-normal)}
+    .card:hover{box-shadow:var(--shadow-md)}
     .form-row{display:flex;gap:var(--space-md);flex-wrap:wrap;margin-bottom:var(--space-lg)}
     .form-group{flex:1;min-width:170px}
     label{display:block;font-weight:600;margin-bottom:var(--space-xs);color:var(--color-text-label);font-size:.9em}
-    select,input[type="number"]{width:100%;padding:10px 14px;border:1.5px solid var(--color-border-input);border-radius:var(--radius-sm);font-size:1em;transition:border-color var(--transition-normal),background var(--transition-normal);outline:none;background:var(--color-bg-input);color:var(--color-text);min-height:44px}
-    select:focus,input:focus{border-color:var(--color-primary);background:white;box-shadow:0 0 0 3px rgba(79,70,229,.12)}
-    button{width:100%;padding:14px;background:var(--color-primary);color:white;border:none;border-radius:var(--radius-sm);font-size:1.1em;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:background var(--transition-fast),transform var(--transition-fast);min-height:44px}
-    button:hover{background:var(--color-primary-hover)}
-    button:active{background:var(--color-primary-active);transform:scale(0.98)}
+    select,input[type="number"]{width:100%;padding:10px 14px;border:1px solid var(--color-border-input);border-radius:var(--radius-md);font-size:1em;transition:border-color var(--transition-fast),box-shadow var(--transition-fast);outline:none;background:var(--color-bg-input);color:var(--color-text);min-height:44px}
+    select:hover,input:hover{border-color:var(--color-primary-hover)}
+    select:focus,input:focus{border-color:var(--color-primary);background:white;box-shadow:0 0 0 3px rgba(22,119,255,.1)}
+    button{width:100%;padding:14px;background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);font-size:1.05em;font-weight:700;cursor:pointer;letter-spacing:.03em;transition:all var(--transition-fast);min-height:44px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
+    button:hover{background:var(--color-primary-hover);box-shadow:0 4px 12px rgba(22,119,255,.25)}
+    button:active{background:var(--color-primary-active);transform:translateY(1px);box-shadow:none}
     button:focus-visible,select:focus-visible,input:focus-visible,.filter-chip:focus-visible,.quick-btn:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
-    .tier-section{margin-bottom:24px}
-    .tier-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--color-border)}
-    .tier-icon{font-size:1.5em}
-    .tier-label{font-size:1.3em;font-weight:700}
-    .tier-desc{color:var(--color-text-muted);font-size:.85em}
+    .tier-section{margin-bottom:28px;background:var(--color-bg-card);border-radius:var(--radius-lg);padding:var(--space-lg);border:1px solid var(--color-border);box-shadow:var(--shadow-sm)}
+    .tier-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--color-border)}
+    .tier-icon{font-size:1.4em}
+    .tier-label{font-size:1.15em;font-weight:700}
+    .tier-desc{color:var(--color-text-muted);font-size:.82em}
     .tier-reach .tier-header{border-color:var(--color-reach)}
     .tier-match .tier-header{border-color:var(--color-match)}
     .tier-safety .tier-header{border-color:var(--color-safety)}
-    .school-card{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin-bottom:6px;border-radius:var(--radius-sm);background:var(--color-bg-subtle);transition:background var(--transition-fast),border-color var(--transition-fast);border:1px solid transparent}
-    .school-card:hover{background:var(--color-primary-light);border-color:var(--color-border-input)}
-    .school-name{font-weight:600;font-size:1.05em}
-    .school-meta{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap}
-    .badge{display:inline-block;padding:2px 8px;border-radius:var(--radius-sm);font-size:.75em;font-weight:600}
-    .badge-985{background:var(--color-accent-light);color:#92400E}
-    .badge-211{background:#DCFCE7;color:#166534}
+    .school-card{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;margin-bottom:6px;border-radius:var(--radius-md);background:var(--color-bg-subtle);transition:all var(--transition-fast);border:1px solid transparent}
+    .school-card:hover{background:var(--color-primary-light);border-color:rgba(22,119,255,.12);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+    .school-name{font-weight:600;font-size:1.02em}
+    .school-meta{display:flex;gap:6px;align-items:center;margin-top:5px;flex-wrap:wrap}
+    .badge{display:inline-block;padding:2px 10px;border-radius:var(--radius-sm);font-size:.75em;font-weight:600;line-height:1.6}
+    .badge-985{background:var(--color-accent-light);color:#D46B08}
+    .badge-211{background:#E8FFEA;color:#0B8235}
     .badge-city{background:var(--color-primary-light);color:var(--color-primary)}
     .badge-tag{background:var(--color-bg-subtle);color:var(--color-text-secondary)}
     .school-score{text-align:right;min-width:80px}
@@ -122,7 +133,7 @@
     .diff-pos{color:var(--color-reach)}
     .diff-neg{color:var(--color-match)}
     .diff-zero{color:var(--color-text-muted)}
-    .info-bar{background:var(--color-primary-light);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:22px;font-size:.95em;color:var(--color-text-label);line-height:1.6;border-left:3px solid var(--color-primary)}
+    .info-bar{background:var(--color-primary-light);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:24px;font-size:.92em;color:var(--color-text-label);line-height:1.6;border-left:3px solid var(--color-primary)}
     .empty-state{text-align:center;padding:40px;color:var(--color-text-muted)}
     .loading{text-align:center;padding:40px}
     .loading .spinner{display:inline-block;width:40px;height:40px;border:3px solid var(--color-border);border-top:3px solid var(--color-primary);border-radius:50%;animation:spin .8s linear infinite}
@@ -1533,5 +1544,6 @@
     }
   }
   </script>
+  <!-- UI STATE (June 15 06:41): CSS tokens → enterprise blue #1677FF. Topbar CSS defined, no HTML yet. Forms/tiers/info-bar refined. Fully functional. -->
 </body>
 </html>
