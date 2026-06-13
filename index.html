@@ -453,6 +453,7 @@
 
     updateSubjectUI();
     initFilters();
+    computeProvinceCV();  // Pre-compute per-province mean CV for volatility context
 
     // Hide loading overlay
     const overlay = document.getElementById('loading-overlay');
@@ -491,7 +492,44 @@
     return { dir: 'stable', slope: Math.round(slope) };
   }
 
-  function computeVolatility(history) {
+  // === Province CV Stats ===
+  let PROVINCE_CV = {};  // province -> { mean, count }
+
+  function computeProvinceCV() {
+    // Compute per-province mean CV of min_rank across years
+    const groups = {};  // (uid|province|subject) -> [ranks by year]
+    for (const e of SCORE_LINES) {
+      if (!e.min_rank || e.min_rank <= 0) continue;
+      const key = `${e.university_id}|${e.province}|${e.subject || ''}`;
+      if (!groups[key]) groups[key] = {};
+      const y = e.year || 2024;
+      if (!groups[key][y] || e.min_rank < groups[key][y]) {
+        groups[key][y] = e.min_rank;
+      }
+    }
+
+    const provinceCVs = {};
+    for (const [key, yearMap] of Object.entries(groups)) {
+      const ranks = Object.values(yearMap);
+      if (ranks.length < 2) continue;
+      const mean = ranks.reduce((a, b) => a + b, 0) / ranks.length;
+      if (mean <= 0) continue;
+      const variance = ranks.reduce((sum, r) => sum + (r - mean) ** 2, 0) / ranks.length;
+      const cv = Math.sqrt(variance) / mean;
+      const province = key.split('|')[1];
+      if (!provinceCVs[province]) provinceCVs[province] = [];
+      provinceCVs[province].push(cv);
+    }
+
+    for (const [prov, cvs] of Object.entries(provinceCVs)) {
+      PROVINCE_CV[prov] = {
+        mean: Math.round((cvs.reduce((a, b) => a + b, 0) / cvs.length) * 1000) / 1000,
+        count: cvs.length,
+      };
+    }
+  }
+
+  function computeVolatility(history, province) {
     // Compute CV (coefficient of variation) of min_rank across years
     const ranks = history.filter(h => h.min_rank != null && h.min_rank > 0).map(h => h.min_rank);
     if (ranks.length < 2) return { cv: null, level: 'unknown', label: '数据不足' };
@@ -499,12 +537,31 @@
     if (mean <= 0) return { cv: null, level: 'unknown', label: '数据不足' };
     const variance = ranks.reduce((sum, r) => sum + (r - mean) ** 2, 0) / ranks.length;
     const cv = Math.sqrt(variance) / mean;
-    const level = cv < 0.2 ? 'stable' : cv > 0.4 ? 'volatile' : 'moderate';
+    const cvRound = Math.round(cv * 1000) / 1000;
     const pctStr = Math.round(cv * 100) + '%';
-    const label = level === 'stable' ? `✅ 录取稳定（${ranks.length}年波动 ${pctStr}）`
-                : level === 'volatile' ? `⚠️ 录取不稳定（${ranks.length}年波动 ${pctStr}）`
-                : `📊 中等波动（${ranks.length}年 CV=${cv.toFixed(2)}）`;
-    return { cv: Math.round(cv * 1000) / 1000, level, label };
+
+    // Province-relative context
+    const provStats = province ? PROVINCE_CV[province] : null;
+    const provMean = provStats ? provStats.mean : 0.20;
+    const isHighNoise = provMean >= 0.25;
+    const noiseCtx = isHighNoise ? `（${province}录取位次整体波动较大）` : '';
+
+    let level, label;
+    if (cv <= provMean * 0.8) {
+      level = 'stable';
+      label = `✅ 比本省多数学校稳定（${ranks.length}年波动 ${pctStr}）${noiseCtx}`;
+    } else if (cv >= provMean * 2.0) {
+      level = 'volatile';
+      label = `⚠️ 波动显著高于本省平均（${ranks.length}年 CV=${cv.toFixed(2)}，本省均值 ${provMean.toFixed(2)}）${noiseCtx}`;
+    } else if (cv >= provMean * 1.3) {
+      level = 'moderate';
+      label = `📊 略高于本省平均（${ranks.length}年 CV=${cv.toFixed(2)}，本省均值 ${provMean.toFixed(2)}）${noiseCtx}`;
+    } else {
+      level = 'stable';
+      label = `✅ 与本省平均持平（${ranks.length}年波动 ${pctStr}）${noiseCtx}`;
+    }
+
+    return { cv: cvRound, level, label, provMean };
   }
 
   function buildSparkline(history, trendDir) {
@@ -823,7 +880,7 @@
       }
       const history = Object.values(histByYear).sort((a, b) => a.year - b.year);
       const trend = computeTrend(history);
-      const volatility = computeVolatility(history);
+      const volatility = computeVolatility(history, province);
       const info = {
         name: uni.name,
         tier: uni.tier,
@@ -988,12 +1045,12 @@
           const trendBadge = (s.history && s.history.length >= 2) ? `<span class="trend-badge ${trendClass}">${trendLabel}</span>` : '';
           const sparkline = buildSparkline(s.history || [], t.dir);
 
-          // Volatility badge
+          // Volatility badge — province-relative
           const volLevel = s.volatility_level || 'unknown';
           const volLabel = s.volatility_label || '';
-          const volBadge = volLevel === 'volatile' ? `<span class="trend-badge trend-up" title="近年录取位次波动大，预测不确定性高">⚠️ 波动大</span>`
-                         : volLevel === 'stable' ? `<span class="trend-badge trend-stable" title="近年录取位次稳定，预测可靠">✅ 稳定</span>`
-                         : volLevel === 'moderate' ? `<span class="trend-badge" style="background:#ede8df;color:#8a8275" title="近年录取位次有一定波动">📊 中等</span>`
+          const volBadge = volLevel === 'volatile' ? `<span class="trend-badge trend-up" title="${volLabel}">⚠️ 波动大</span>`
+                         : volLevel === 'stable' ? `<span class="trend-badge trend-stable" title="${volLabel}">✅ 稳定</span>`
+                         : volLevel === 'moderate' ? `<span class="trend-badge" style="background:#ede8df;color:#8a8275" title="${volLabel}">📊 中等</span>`
                          : '';
 
           html += `<div class="school-card">
