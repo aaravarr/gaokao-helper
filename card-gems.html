@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1080px;
+  height: 1440px;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(160deg, #0a1628, #16213e, #0f3460);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 72px;
+}
+.badge {
+  display: inline-block;
+  background: rgba(236,72,153,0.15);
+  border: 1px solid rgba(236,72,153,0.3);
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 26px;
+  color: #f9a8d4;
+  margin-bottom: 40px;
+}
+h1 {
+  font-size: 60px;
+  font-weight: 800;
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+h1 span { color: #6ee7b7; }
+.subtitle {
+  font-size: 30px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 48px;
+  line-height: 1.5;
+}
+.table-header {
+  display: flex;
+  padding: 16px 24px;
+  font-size: 22px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 8px;
+}
+.th-rank { width: 60px; }
+.th-school { flex: 1; }
+.th-city { width: 140px; }
+.th-score { width: 140px; text-align: right; }
+.table-row {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.2s;
+}
+.table-row:nth-child(odd) {
+  background: rgba(255,255,255,0.03);
+}
+.rank {
+  width: 60px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #f472b6;
+}
+.school-info { flex: 1; }
+.school-name {
+  font-size: 30px;
+  font-weight: 700;
+}
+.school-tags {
+  margin-top: 6px;
+}
+.school-tag {
+  display: inline-block;
+  font-size: 18px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-right: 8px;
+}
+.tag-211 { background: rgba(245,158,11,0.2); color: #fcd34d; }
+.tag-double { background: rgba(110,231,183,0.15); color: #6ee7b7; }
+.city {
+  width: 140px;
+  font-size: 26px;
+  color: rgba(255,255,255,0.6);
+}
+.score {
+  width: 140px;
+  text-align: right;
+  font-size: 36px;
+  font-weight: 800;
+  color: #6ee7b7;
+}
+.score span {
+  font-size: 20px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 400;
+}
+.highlight-row {
+  background: rgba(110,231,183,0.06) !important;
+  border-left: 3px solid #6ee7b7;
+}
+.insight-box {
+  margin-top: auto;
+  background: rgba(110,231,183,0.08);
+  border: 1px solid rgba(110,231,183,0.2);
+  border-radius: 16px;
+  padding: 28px 32px;
+  font-size: 28px;
+  line-height: 1.6;
+  color: #a7f3d0;
+}
+.insight-box strong {
+  color: #6ee7b7;
+}
+.footer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-brand {
+  font-size: 28px;
+  font-weight: 700;
+  color: #b33a2b;
+}
+.footer-url {
+  font-size: 22px;
+  color: rgba(255,255,255,0.4);
+}
+</style>
+</head>
+<body>
+  <div class="badge">🎯 低分上名校</div>
+  <h1>500 分出头，<br><span>211 学历到手。</span></h1>
+  <p class="subtitle">这些正经 211 / 双一流高校，录取分低到离谱。<br>代价只有一个：地理位置偏远。</p>
+
+  <div class="table-header">
+    <div class="th-rank">#</div>
+    <div class="th-school">学校</div>
+    <div class="th-city">城市</div>
+    <div class="th-score">平均分</div>
+  </div>
+
+  <div class="table-row highlight-row">
+    <div class="rank">1</div>
+    <div class="school-info">
+      <div class="school-name">延边大学</div>
+      <div class="school-tags">
+        <span class="school-tag tag-211">211</span>
+        <span class="school-tag tag-double">双一流</span>
+      </div>
+    </div>
+    <div class="city">延边</div>
+    <div class="score">501 <span>分</span></div>
+  </div>
+
+  <div class="table-row">
+    <div class="rank">2</div>
+    <div class="school-info">
+      <div class="school-name">西藏大学</div>
+      <div class="school-tags">
+        <span class="school-tag tag-211">211</span>
+        <span class="school-tag tag-double">双一流</span>
+      </div>
+    </div>
+    <div class="city">拉萨</div>
+    <div class="score">504 <span>分</span></div>
+  </div>
+
+  <div class="table-row">
+    <div class="rank">3</div>
+    <div class="school-info">
+      <div class="school-name">石河子大学</div>
+      <div class="school-tags">
+        <span class="school-tag tag-211">211</span>
+        <span class="school-tag tag-double">双一流</span>
+      </div>
+    </div>
+    <div class="city">石河子</div>
+    <div class="score">508 <span>分</span></div>
+  </div>
+
+  <div class="table-row">
+    <div class="rank">4</div>
+    <div class="school-info">
+      <div class="school-name">青海大学</div>
+      <div class="school-tags">
+        <span class="school-tag tag-211">211</span>
+        <span class="school-tag tag-double">双一流</span>
+      </div>
+    </div>
+    <div class="city">西宁</div>
+    <div class="score">524 <span>分</span></div>
+  </div>
+
+  <div class="table-row">
+    <div class="rank">5</div>
+    <div class="school-info">
+      <div class="school-name">内蒙古大学</div>
+      <div class="school-tags">
+        <span class="school-tag tag-211">211</span>
+        <span class="school-tag tag-double">双一流</span>
+      </div>
+    </div>
+    <div class="city">呼和浩特</div>
+    <div class="score">524 <span>分</span></div>
+  </div>
+
+  <div class="table-row">
+    <div class="rank">6</div>
+    <div class="school-info">
+      <div class="school-name">新疆大学</div>
+      <div class="school-tags">
+        <span class="school-tag tag-211">211</span>
+        <span class="school-tag tag-double">双一流</span>
+      </div>
+    </div>
+    <div class="city">乌鲁木齐</div>
+    <div class="score">524 <span>分</span></div>
+  </div>
+
+  <div class="table-row">
+    <div class="rank">7</div>
+    <div class="school-info">
+      <div class="school-name">海南大学</div>
+      <div class="school-tags">
+        <span class="school-tag tag-211">211</span>
+        <span class="school-tag tag-double">双一流</span>
+      </div>
+    </div>
+    <div class="city">海口</div>
+    <div class="score">527 <span>分</span></div>
+  </div>
+
+  <div class="table-row">
+    <div class="rank">8</div>
+    <div class="school-info">
+      <div class="school-name">宁夏大学</div>
+      <div class="school-tags">
+        <span class="school-tag tag-211">211</span>
+        <span class="school-tag tag-double">双一流</span>
+      </div>
+    </div>
+    <div class="city">银川</div>
+    <div class="score">533 <span>分</span></div>
+  </div>
+
+  <div class="insight-box">
+    💡 HR 筛简历只看学校名字，不看城市。<br>
+    <strong>同样写着"211"的毕业证，一个 501 分，一个 612 分。</strong><br>
+    这就是信息差。
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">⭐ 志愿星</div>
+    <div class="footer-url">aaravarr.github.io/gaokao-helper</div>
+  </div>
+</body>
+</html>

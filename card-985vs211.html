@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1080px;
+  height: 1440px;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(160deg, #0f0c29, #302b63, #24243e);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 72px;
+}
+.badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 26px;
+  color: #a78bfa;
+  margin-bottom: 40px;
+  letter-spacing: 0.05em;
+}
+h1 {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+h1 span { color: #f472b6; }
+.subtitle {
+  font-size: 32px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 56px;
+  line-height: 1.5;
+}
+.stats-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 56px;
+}
+.stat-card {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 56px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6ee7b7, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.stat-label {
+  font-size: 24px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 8px;
+}
+.vs-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.vs-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.school-card {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 28px;
+}
+.school-card.highlight {
+  border-color: #f472b6;
+  background: rgba(244,114,182,0.08);
+}
+.school-name {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.school-tag {
+  display: inline-block;
+  font-size: 22px;
+  padding: 4px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.tag-985 { background: rgba(99,102,241,0.3); color: #a5b4fc; }
+.tag-211 { background: rgba(245,158,11,0.3); color: #fcd34d; }
+.school-score {
+  font-size: 44px;
+  font-weight: 800;
+  color: #6ee7b7;
+}
+.school-score span {
+  font-size: 24px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 400;
+}
+.vs-badge {
+  font-size: 28px;
+  font-weight: 800;
+  color: #f472b6;
+  min-width: 50px;
+  text-align: center;
+}
+.takeaway {
+  margin-top: auto;
+  background: rgba(244,114,182,0.1);
+  border: 1px solid rgba(244,114,182,0.3);
+  border-radius: 16px;
+  padding: 28px 32px;
+  font-size: 30px;
+  line-height: 1.6;
+  color: #f9a8d4;
+}
+.footer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-brand {
+  font-size: 28px;
+  font-weight: 700;
+  color: #b33a2b;
+}
+.footer-url {
+  font-size: 22px;
+  color: rgba(255,255,255,0.4);
+}
+</style>
+</head>
+<body>
+  <div class="badge">📊 260,955 条真实录取数据</div>
+  <h1>985 一定比 211 好？<br><span>数据说：不一定。</span></h1>
+  <p class="subtitle">899 所高校 × 31 省 × 4 年（2022-2025）<br>全部来自百度高考真实录取分数线</p>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">70/77</div>
+      <div class="stat-label">所 211 超过最易 985</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">45 分</div>
+      <div class="stat-label">城市溢价</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">1 分</div>
+      <div class="stat-label">211 vs 双一流差距</div>
+    </div>
+  </div>
+
+  <div class="vs-section">
+    <div class="vs-row">
+      <div class="school-card highlight">
+        <div class="school-name">北京邮电大学</div>
+        <div class="school-tag tag-211">211</div>
+        <div class="school-score">612 <span>分</span></div>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div class="school-card">
+        <div class="school-name">西北农林科技大学</div>
+        <div class="school-tag tag-985">985</div>
+        <div class="school-score">572 <span>分</span></div>
+      </div>
+    </div>
+    <div class="vs-row">
+      <div class="school-card highlight">
+        <div class="school-name">上海财经大学</div>
+        <div class="school-tag tag-211">211</div>
+        <div class="school-score">612 <span>分</span></div>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div class="school-card">
+        <div class="school-name">兰州大学</div>
+        <div class="school-tag tag-985">985</div>
+        <div class="school-score">584 <span>分</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="takeaway">
+    💡 结论：别被标签绑架。<br>看分数，不看帽子。看城市，也看性价比。
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">⭐ 志愿星</div>
+    <div class="footer-url">aaravarr.github.io/gaokao-helper</div>
+  </div>
+</body>
+</html>

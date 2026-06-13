@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>跨省分数换算 — 志愿星</title>
+<meta name="description" content="输入你的高考分数和省份，一键换算到全国31省等效分数。基于26万条真实录取数据。">
+<meta name="keywords" content="高考分数换算,跨省分数对比,高考等效分,志愿填报,2026高考">
+<meta property="og:title" content="跨省分数换算 — 志愿星">
+<meta property="og:description" content="550分在四川等于多少分？基于26万条录取数据的省际等效分换算">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB',sans-serif;background:#f5f0e8;color:#2c2416;line-height:1.6}
+.container{max-width:800px;margin:0 auto;padding:16px}
+header{text-align:center;padding:24px 0}
+header h1{font-size:1.8em;color:#b33a2b}
+header h1 span{color:#d4a843}
+header p{color:#7a6e5a;font-size:1.1em;margin-top:8px}
+.tool{background:#fff;border-radius:12px;padding:24px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.tool h2{font-size:1.2em;color:#2c2416;margin-bottom:16px}
+.form-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.form-row label{display:flex;flex-direction:column;flex:1;min-width:120px;font-size:.9em;color:#7a6e5a}
+.form-row select,.form-row input{padding:10px 12px;border:1px solid #d4c8b0;border-radius:8px;font-size:1em;background:#faf8f3;color:#2c2416;margin-top:4px}
+.btn{background:#b33a2b;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:1em;cursor:pointer;width:100%;margin-top:8px}
+.btn:hover{background:#9a3025}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.result{display:none;margin-top:20px}
+.result.show{display:block}
+.result h3{color:#b33a2b;margin-bottom:12px}
+.result-note{font-size:.85em;color:#7a6e5a;margin-bottom:16px;background:#f9f6ef;padding:12px;border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:.9em}
+th{background:#f5f0e8;padding:10px 8px;text-align:left;font-weight:600;color:#5a4e3a;position:sticky;top:0}
+td{padding:8px;border-bottom:1px solid #ede6d8}
+tr:hover td{background:#faf8f3}
+.highlight{background:#fff3e0 !important;font-weight:600}
+.score-up{color:#b33a2b;font-weight:600}
+.score-down{color:#4a7c59;font-weight:600}
+.score-same{color:#7a6e5a}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.8em;font-weight:600}
+.badge-up{background:#fde8e8;color:#b33a2b}
+.badge-down{background:#e8f5e9;color:#4a7c59}
+.badge-same{background:#f5f0e8;color:#7a6e5a}
+.method{margin-top:24px;padding:16px;background:#f9f6ef;border-radius:8px;font-size:.85em;color:#7a6e5a}
+.method h3{color:#5a4e3a;font-size:1em;margin-bottom:8px}
+footer{text-align:center;padding:24px 0;color:#a09882;font-size:.85em}
+footer a{color:#b33a2b;text-decoration:none}
+.search-box{margin-bottom:12px}
+.search-box input{width:100%;padding:10px 12px;border:1px solid #d4c8b0;border-radius:8px;font-size:1em;background:#faf8f3}
+.sort-btns{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.sort-btn{padding:6px 12px;border:1px solid #d4c8b0;border-radius:6px;background:#fff;font-size:.85em;cursor:pointer;color:#5a4e3a}
+.sort-btn.active{background:#b33a2b;color:#fff;border-color:#b33a2b}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⭐ 志愿<span>星</span></h1>
+    <p>跨省分数换算 — 你的分数在其他省等于多少？</p>
+  </header>
+
+  <div class="tool">
+    <h2>📊 分数换算</h2>
+    <div class="form-row">
+      <label>你的省份
+        <select id="my-province"></select>
+      </label>
+      <label>你的分数
+        <input type="number" id="my-score" placeholder="如 550" min="100" max="750">
+      </label>
+      <label>科类
+        <select id="my-subject">
+          <option value="science">物理类 / 理科</option>
+          <option value="liberal">历史类 / 文科</option>
+        </select>
+      </label>
+    </div>
+    <button class="btn" id="convert-btn" onclick="doConvert()">换算到全国</button>
+
+    <div class="result" id="result">
+      <h3 id="result-title"></h3>
+      <div class="result-note" id="result-note"></div>
+      
+      <div class="search-box">
+        <input type="text" id="search" placeholder="🔍 搜索省份..." oninput="filterTable()">
+      </div>
+      <div class="sort-btns">
+        <button class="sort-btn active" onclick="sortTable('equiv',this)">按等效分排序</button>
+        <button class="sort-btn" onclick="sortTable('name',this)">按省份排序</button>
+        <button class="sort-btn" onclick="sortTable('gap',this)">按分差排序</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>省份</th>
+            <th>等效分数</th>
+            <th>分差</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody id="result-body"></tbody>
+      </table>
+
+      <div class="method">
+        <h3>📐 换算方法</h3>
+        <p>基于 <strong>2024年全国899所高校理科/物理类录取数据</strong>（260,955条记录），
+        计算每个省的录取中位分数，以你的省份为基准进行等比换算。</p>
+        <p style="margin-top:8px"><strong>局限性</strong>：① 仅反映985/211/双一流高校的录取分布，
+        不代表全省考生排名；② 海南使用900分制，换算仅供参考；③ 2025年高考改革省份
+        （四川等8省）数据包含新旧两种计分。</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <a href="index.html">← 回到志愿星</a> · 数据来源：2022-2025年全国高校录取数据 · 免费工具
+  </footer>
+</div>
+
+<script>
+// Province median scores (science, 2024) computed from data2.json
+const PROVINCE_MEDIANS = {
+  "上海": 561, "云南": 497, "内蒙古": 503, "北京": 635, "吉林": 500,
+  "四川": 510, "天津": 636, "宁夏": 450, "安徽": 520, "山东": 604,
+  "山西": 463, "广东": 526, "广西": 477, "新疆": 432, "江苏": 537,
+  "江西": 513, "河北": 503, "河南": 478, "浙江": 649, "海南": 701,
+  "湖北": 525, "湖南": 498, "甘肃": 475, "福建": 528, "西藏": 372,
+  "贵州": 478, "辽宁": 478, "重庆": 508, "陕西": 456, "青海": 381,
+  "黑龙江": 484
+};
+
+const SORT_NAMES = {"上海":"上海","云南":"云南","内蒙古":"内蒙古","北京":"北京","吉林":"吉林",
+  "四川":"四川","天津":"天津","宁夏":"宁夏","安徽":"安徽","山东":"山东","山西":"山西",
+  "广东":"广东","广西":"广西","新疆":"新疆","江苏":"江苏","江西":"江西","河北":"河北",
+  "河南":"河南","浙江":"浙江","海南":"海南","湖北":"湖北","湖南":"湖南","甘肃":"甘肃",
+  "福建":"福建","西藏":"西藏","贵州":"贵州","辽宁":"辽宁","重庆":"重庆","陕西":"陕西",
+  "青海":"青海","黑龙江":"黑龙江"};
+
+// Liberal arts / 文科 median scores (2024) — COMPUTED FROM DATA
+// 3+3 provinces (浙江/上海/北京/天津/山东/海南) don't have separate 文科 track
+// For these, use science medians with a note
+const LIBERAL_MEDIANS = {
+  "上海": 561, "云南": 537, "内蒙古": 462, "北京": 635, "吉林": 504,
+  "四川": 508, "天津": 636, "宁夏": 486, "安徽": 510, "山东": 604,
+  "山西": 469, "广东": 507, "广西": 486, "新疆": 449, "江苏": 532,
+  "江西": 523, "河北": 518, "河南": 492, "浙江": 649, "海南": 701,
+  "湖北": 510, "湖南": 495, "甘肃": 480, "福建": 494, "西藏": 389,
+  "贵州": 497, "辽宁": 492, "重庆": 503, "陕西": 467, "青海": 435,
+  "黑龙江": 503
+};
+
+// 3+3 provinces: no separate liberal arts track
+const THREE_PLUS_THREE = new Set(["浙江", "上海", "北京", "天津", "山东", "海南"]);
+
+let currentSort = 'equiv';
+let currentData = [];
+
+// Populate province dropdown
+const sel = document.getElementById('my-province');
+const provs = Object.keys(PROVINCE_MEDIANS).sort();
+provs.forEach(p => {
+  const opt = document.createElement('option');
+  opt.value = p; opt.textContent = p;
+  if (p === '四川') opt.selected = true;
+  sel.appendChild(opt);
+});
+
+function doConvert() {
+  const myProv = document.getElementById('my-province').value;
+  const myScore = parseInt(document.getElementById('my-score').value);
+  const subject = document.getElementById('my-subject').value;
+  
+  if (!myScore || myScore < 100 || myScore > 750) {
+    alert('请输入有效的高考分数（100-750）');
+    return;
+  }
+
+  const medians = subject === 'liberal' ? LIBERAL_MEDIANS : PROVINCE_MEDIANS;
+  const myMedian = medians[myProv];
+  
+  currentData = [];
+  for (const [prov, median] of Object.entries(medians)) {
+    const ratio = median / myMedian;
+    const equiv = Math.round(myScore * ratio);
+    const gap = equiv - myScore;
+    currentData.push({ prov, equiv, gap, ratio, isHome: prov === myProv });
+  }
+
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result-title').textContent = 
+    `${myProv} ${myScore}分 → 全国等效分数`;
+  document.getElementById('result-note').innerHTML = 
+    `基于2024年${subject === 'liberal' ? '文科/历史类' : '理科/物理类'}录取中位数换算。` +
+    `你的省份中位数 <strong>${myMedian}</strong> 分。` +
+    (myProv === '海南' ? '<br>⚠️ 海南使用900分制，换算结果仅供参考。' : '') +
+    (subject === 'liberal' && THREE_PLUS_THREE.has(myProv) ? '<br>📌 3+3省份无单独文科排名，使用综合排名数据。' : '');
+
+  renderTable();
+}
+
+function renderTable() {
+  const sorted = [...currentData].sort((a, b) => {
+    if (currentSort === 'equiv') return b.equiv - a.equiv;
+    if (currentSort === 'gap') return Math.abs(b.gap) - Math.abs(a.gap);
+    return a.prov.localeCompare(b.prov, 'zh');
+  });
+
+  const search = document.getElementById('search').value.trim();
+  const filtered = search ? sorted.filter(d => d.prov.includes(search)) : sorted;
+
+  const body = document.getElementById('result-body');
+  body.innerHTML = filtered.map(d => {
+    const cls = d.isHome ? 'highlight' : '';
+    const gapClass = d.gap > 0 ? 'score-up' : d.gap < 0 ? 'score-down' : 'score-same';
+    const badgeClass = d.gap > 0 ? 'badge-up' : d.gap < 0 ? 'badge-down' : 'badge-same';
+    const badgeText = d.isHome ? '你的省' : d.gap > 0 ? '换算更高' : d.gap < 0 ? '换算更低' : '相同';
+    const note = d.prov === '海南' ? '（900分制）' : 
+                 d.prov === '西藏' ? '（样本较少）' : '';
+    return `<tr class="${cls}">
+      <td>${d.prov}${note}</td>
+      <td class="${gapClass}">${d.equiv}</td>
+      <td>${d.gap > 0 ? '+' : ''}${d.gap}</td>
+      <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function sortTable(sort, btn) {
+  currentSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function filterTable() {
+  renderTable();
+}
+
+// Auto-convert if score is entered
+document.getElementById('my-score').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doConvert();
+});
+</script>
+</body>
+</html>
