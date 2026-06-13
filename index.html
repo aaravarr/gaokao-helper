@@ -924,6 +924,7 @@
       ${getActiveFilterCount() > 0 ? ` · 🔍 已筛选` : ''}
       　共匹配到 <strong>${total}</strong> 所学校
       <button id="share-btn" onclick="shareResult()" style="float:right;padding:6px 16px;background:#b33a2b;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em">📋 复制分享链接</button>
+      <button id="card-btn" onclick="generateCard()" style="float:right;padding:6px 16px;background:#d4a853;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em;margin-right:8px">📸 生成图片</button>
       <button id="report-btn" onclick="showReport()" style="float:right;padding:6px 16px;background:#2c5282;color:white;border:none;border-radius:3px;cursor:pointer;font-size:.85em;margin-right:8px">📄 保存报告</button>
     </div>
     ${data.provinceTotal < 3 ? '<div style="background:#f5e6d0;border-radius:3px;padding:10px 14px;margin-bottom:16px;font-size:.85em;color:#8b5a2b">⚠️ 该省份录取数据较少，部分学校显示的是全国平均分数作为参考（标有"参考"标签）</div>' : ''}
@@ -1059,6 +1060,188 @@
     } else {
       prompt('复制链接分享：', url);
     }
+  }
+
+  function generateCard() {
+    if (!LAST_RESULTS) return;
+    const d = LAST_RESULTS;
+    const W = 750;
+    const tiers = [
+      { key: '冲一冲', icon: '🔥', color: '#c0392b', bg: '#fdf2f0' },
+      { key: '稳一稳', icon: '✅', color: '#27ae60', bg: '#f0faf4' },
+      { key: '保一保', icon: '🛡️', color: '#2980b9', bg: '#f0f5fa' },
+    ];
+    // Collect top schools per tier
+    const tierData = tiers.map(t => {
+      const schools = (d.results[t.key] || []).slice(0, 4);
+      return { ...t, schools, total: (d.results[t.key] || []).length };
+    });
+    // Calculate dynamic height
+    const rowH = 44;
+    const headerH = 180;
+    const tierHeaderH = 52;
+    const footerH = 100;
+    let totalRows = 0;
+    for (const t of tierData) totalRows += Math.min(t.schools.length, 4);
+    const H = headerH + tierData.length * tierHeaderH + totalRows * rowH + footerH + 30;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W * 2; canvas.height = H * 2;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(2, 2);
+
+    // Background
+    ctx.fillStyle = '#f5f0e8';
+    ctx.fillRect(0, 0, W, H);
+
+    // Header card
+    roundRect(ctx, 20, 20, W - 40, headerH - 10, 8);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.strokeStyle = '#e8e0d4';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Title
+    ctx.fillStyle = '#b33a2b';
+    ctx.font = 'bold 28px "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.fillText('志愿星', 44, 62);
+    ctx.fillStyle = '#d4a853';
+    ctx.font = 'bold 28px "PingFang SC", "Microsoft YaHei", sans-serif';
+    // star
+    ctx.fillText('⭐', 44 + ctx.measureText('志愿').width + 4, 62);
+
+    ctx.fillStyle = '#6b6356';
+    ctx.font = '14px "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.fillText('高考志愿填报助手 · 899所高校 · 26万+真实数据', 44, 86);
+
+    // Score
+    ctx.fillStyle = '#2c2c2c';
+    ctx.font = 'bold 22px "PingFang SC", "Microsoft YaHei", sans-serif';
+    const scoreText = `${d.province} · ${d.subject} · ${d.score}分`;
+    ctx.fillText(scoreText, 44, 126);
+    if (d.rank) {
+      ctx.fillStyle = '#8a8275';
+      ctx.font = '16px "PingFang SC", "Microsoft YaHei", sans-serif';
+      ctx.fillText(`位次 ≈${d.rank.toLocaleString()}`, 44, 152);
+    }
+    // Total count on right
+    let grandTotal = 0;
+    for (const t of tierData) grandTotal += t.total;
+    ctx.fillStyle = '#b33a2b';
+    ctx.font = 'bold 18px "PingFang SC", "Microsoft YaHei", sans-serif';
+    const countText = `共${grandTotal}所`;
+    ctx.fillText(countText, W - 44 - ctx.measureText(countText).width, 126);
+
+    // Tier sections
+    let y = headerH + 10;
+    for (const tier of tierData) {
+      // Tier header card
+      roundRect(ctx, 20, y, W - 40, tierHeaderH - 6 + Math.min(tier.schools.length, 4) * rowH, 8);
+      ctx.fillStyle = tier.bg;
+      ctx.fill();
+      ctx.strokeStyle = tier.color + '40';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Tier label
+      ctx.fillStyle = tier.color;
+      ctx.font = 'bold 17px "PingFang SC", "Microsoft YaHei", sans-serif';
+      ctx.fillText(`${tier.icon} ${tier.key}`, 40, y + 28);
+      ctx.fillStyle = '#8a8275';
+      ctx.font = '13px "PingFang SC", "Microsoft YaHei", sans-serif';
+      const extra = tier.total > 4 ? ` 等${tier.total}所` : ` ${tier.total}所`;
+      ctx.fillText(extra, 40 + ctx.measureText(`${tier.icon} ${tier.key}`).width + 8, y + 28);
+
+      // School rows
+      const schools = tier.schools.slice(0, 4);
+      for (let i = 0; i < schools.length; i++) {
+        const s = schools[i];
+        const sy = y + tierHeaderH + i * rowH - 10;
+        // Divider
+        if (i > 0) {
+          ctx.strokeStyle = '#e8e0d4';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(40, sy - 12);
+          ctx.lineTo(W - 40, sy - 12);
+          ctx.stroke();
+        }
+        // School name
+        ctx.fillStyle = '#2c2c2c';
+        ctx.font = 'bold 15px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.fillText(s.name, 44, sy + 14);
+        // Tier badge
+        let badgeX = 44 + ctx.measureText(s.name).width + 8;
+        if (s.tier === '985' || s.tier === '211') {
+          ctx.fillStyle = s.tier === '985' ? '#b33a2b' : '#d4a853';
+          ctx.font = 'bold 11px "PingFang SC", "Microsoft YaHei", sans-serif';
+          const badge = ` ${s.tier} `;
+          const bw = ctx.measureText(badge).width + 6;
+          roundRect(ctx, badgeX, sy + 1, bw, 17, 3);
+          ctx.fillStyle = s.tier === '985' ? '#b33a2b20' : '#d4a85320';
+          ctx.fill();
+          ctx.fillStyle = s.tier === '985' ? '#b33a2b' : '#8b6914';
+          ctx.fillText(badge, badgeX + 3, sy + 14);
+          badgeX += bw + 4;
+        }
+        // City
+        ctx.fillStyle = '#8a8275';
+        ctx.font = '12px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.fillText(s.city, badgeX, sy + 14);
+
+        // Score on right
+        ctx.fillStyle = tier.color;
+        ctx.font = 'bold 20px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.fillText(`${s.min_score}`, W - 44 - ctx.measureText(`${s.min_score}`).width, sy + 16);
+        // Diff
+        const diffVal = s.diff;
+        const diffText = diffVal > 0 ? `+${diffVal}` : `${diffVal}`;
+        ctx.fillStyle = diffVal > 0 ? '#c0392b' : diffVal < 0 ? '#2980b9' : '#8a8275';
+        ctx.font = '12px "PingFang SC", "Microsoft YaHei", sans-serif';
+        const diffW = ctx.measureText(diffText + '分').width;
+        ctx.fillText(`${diffText}分`, W - 44 - diffW, sy + 34);
+      }
+      y += tierHeaderH + Math.min(tier.schools.length, 4) * rowH - 6;
+    }
+
+    // Footer
+    y += 14;
+    ctx.fillStyle = '#a09882';
+    ctx.font = '13px "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('免费 · 无需注册 · 无广告', W / 2, y + 14);
+    ctx.fillStyle = '#b33a2b';
+    ctx.font = 'bold 14px "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.fillText('aaravarr.github.io/gaokao-helper', W / 2, y + 38);
+    ctx.textAlign = 'left';
+
+    // Download
+    const btn = document.getElementById('card-btn');
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `志愿星_${d.score}分_${d.province}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      btn.textContent = '✅ 已保存';
+      setTimeout(() => btn.textContent = '📸 生成图片', 2500);
+    }, 'image/png');
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
   }
 
   // URL-based search on load
