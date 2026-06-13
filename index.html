@@ -491,6 +491,22 @@
     return { dir: 'stable', slope: Math.round(slope) };
   }
 
+  function computeVolatility(history) {
+    // Compute CV (coefficient of variation) of min_rank across years
+    const ranks = history.filter(h => h.min_rank != null && h.min_rank > 0).map(h => h.min_rank);
+    if (ranks.length < 2) return { cv: null, level: 'unknown', label: '数据不足' };
+    const mean = ranks.reduce((a, b) => a + b, 0) / ranks.length;
+    if (mean <= 0) return { cv: null, level: 'unknown', label: '数据不足' };
+    const variance = ranks.reduce((sum, r) => sum + (r - mean) ** 2, 0) / ranks.length;
+    const cv = Math.sqrt(variance) / mean;
+    const level = cv < 0.2 ? 'stable' : cv > 0.4 ? 'volatile' : 'moderate';
+    const pctStr = Math.round(cv * 100) + '%';
+    const label = level === 'stable' ? `✅ 录取稳定（${ranks.length}年波动 ${pctStr}）`
+                : level === 'volatile' ? `⚠️ 录取不稳定（${ranks.length}年波动 ${pctStr}）`
+                : `📊 中等波动（${ranks.length}年 CV=${cv.toFixed(2)}）`;
+    return { cv: Math.round(cv * 1000) / 1000, level, label };
+  }
+
   function buildSparkline(history, trendDir) {
     if (history.length < 2) return '';
     const scores = history.map(h => h.min_score);
@@ -807,6 +823,7 @@
       }
       const history = Object.values(histByYear).sort((a, b) => a.year - b.year);
       const trend = computeTrend(history);
+      const volatility = computeVolatility(history);
       const info = {
         name: uni.name,
         tier: uni.tier,
@@ -819,6 +836,9 @@
         estimated: entry._estimated || false,
         history: history,
         trend: trend,
+        volatility: volatility,
+        volatility_level: volatility.level,
+        volatility_label: volatility.label,
         uid: uid,
       };
 
@@ -968,9 +988,17 @@
           const trendBadge = (s.history && s.history.length >= 2) ? `<span class="trend-badge ${trendClass}">${trendLabel}</span>` : '';
           const sparkline = buildSparkline(s.history || [], t.dir);
 
+          // Volatility badge
+          const volLevel = s.volatility_level || 'unknown';
+          const volLabel = s.volatility_label || '';
+          const volBadge = volLevel === 'volatile' ? `<span class="trend-badge trend-up" title="近年录取位次波动大，预测不确定性高">⚠️ 波动大</span>`
+                         : volLevel === 'stable' ? `<span class="trend-badge trend-stable" title="近年录取位次稳定，预测可靠">✅ 稳定</span>`
+                         : volLevel === 'moderate' ? `<span class="trend-badge" style="background:#ede8df;color:#8a8275" title="近年录取位次有一定波动">📊 中等</span>`
+                         : '';
+
           html += `<div class="school-card">
             <div>
-              <div class="school-name">${s.name}${trendBadge}</div>
+              <div class="school-name">${s.name}${trendBadge}${volBadge}</div>
               <div class="school-meta">
                 ${tierBadge}
                 <span class="badge badge-city">${s.city}</span>
